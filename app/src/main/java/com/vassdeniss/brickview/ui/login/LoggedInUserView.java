@@ -4,7 +4,7 @@ package com.vassdeniss.brickview.ui.login;
  * Class exposing authenticated user details to the UI.
  */
 class LoggedInUserView {
-    private String displayName;
+    private final String displayName;
     //... other data fields that may be accessible to the UI
 
     LoggedInUserView(String displayName) {
@@ -12,6 +12,6 @@ class LoggedInUserView {
     }
 
     String getDisplayName() {
-        return displayName;
+        return this.displayName;
     }
 }

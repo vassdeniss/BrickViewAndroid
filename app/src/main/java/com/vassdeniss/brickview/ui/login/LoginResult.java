@@ -9,9 +9,9 @@ class LoginResult {
     @Nullable
     private LoggedInUserView success;
     @Nullable
-    private Integer error;
+    private String error;
 
-    LoginResult(@Nullable Integer error) {
+    LoginResult(@Nullable String error) {
         this.error = error;
     }
 
@@ -21,11 +21,11 @@ class LoginResult {
 
     @Nullable
     LoggedInUserView getSuccess() {
-        return success;
+        return this.success;
     }
 
     @Nullable
-    Integer getError() {
-        return error;
+    String getError() {
+        return this.error;
     }
 }
