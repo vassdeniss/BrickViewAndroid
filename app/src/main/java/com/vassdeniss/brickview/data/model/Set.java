@@ -4,13 +4,11 @@ public class Set {
     private String _id;
     private String setNum;
     private String name;
-    private String year;
-    private String parts;
+    private int year;
+    private int parts;
     private String image;
     private int minifigCount;
     private Minifigure[] minifigs;
-    private String userImage;
-    private String username;
-    private String review;
-    private String reviewDate;
+    private String user;
+    private String[] videoIds;
 }

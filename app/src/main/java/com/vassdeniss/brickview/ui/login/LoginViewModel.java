@@ -5,13 +5,17 @@ import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
 import android.content.Context;
-import android.util.Log;
 import android.util.Patterns;
 
 import com.android.volley.Request;
+import com.android.volley.RequestQueue;
 import com.android.volley.toolbox.JsonObjectRequest;
+import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
+import com.google.gson.Gson;
 import com.vassdeniss.brickview.R;
+import com.vassdeniss.brickview.data.UserRepository;
+import com.vassdeniss.brickview.data.model.Response;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -19,6 +23,11 @@ import org.json.JSONObject;
 public class LoginViewModel extends ViewModel {
     private final MutableLiveData<LoginFormState> loginFormState = new MutableLiveData<>();
     private final MutableLiveData<LoginResult> loginResult = new MutableLiveData<>();
+    private UserRepository userRepository;
+
+    LoginViewModel(UserRepository userRepository) {
+        this.userRepository = userRepository;
+    }
 
     LiveData<LoginFormState> getLoginFormState() {
         return this.loginFormState;
@@ -29,7 +38,7 @@ public class LoginViewModel extends ViewModel {
     }
 
     public void login(String username, String password, Context context) {
-        String url = "https://brickview.api.vasspass.net/users/login";
+        String url = "https://brickview.api.vasspass.net";
 
         JSONObject body = new JSONObject();
 
@@ -41,11 +50,15 @@ public class LoginViewModel extends ViewModel {
             return;
         }
 
-        JsonObjectRequest request = new JsonObjectRequest(Request.Method.POST, url, body,
+        RequestQueue queue = Volley.newRequestQueue(context);
+
+        JsonObjectRequest request = new JsonObjectRequest(Request.Method.POST, url + "/users/login", body,
                 response -> {
-                    Log.d("Response", response.toString());
-                    // Handle successful login response
-                    // this.loginRepository.setLoggedInUser();
+                    Gson gson = new Gson();
+                    Response res = gson.fromJson(response.toString(), Response.class);
+                    res.user.setImage(res.image);
+                    this.userRepository.setLoggedInUser(res.user);
+                    this.loginResult.setValue(new LoginResult(new LoggedInUserView(res.user.getUsername())));
                 },
                 error -> {
                     if (error.networkResponse != null && error.networkResponse.data != null) {
@@ -60,11 +73,11 @@ public class LoginViewModel extends ViewModel {
                     }
                 });
 
+        StringRequest healthRequest = new StringRequest(Request.Method.GET, url + "/health",
+                response -> queue.add(request), null);
 
-        Volley.newRequestQueue(context).add(request);
-//        if (result instanceof Result.Success) {
-//            User data = ((Result.Success<User>) result).getData();
-//            this.loginResult.setValue(new LoginResult(new LoggedInUserView(data.getDisplayName())));
+
+        queue.add(healthRequest);
     }
 
     public void loginDataChanged(String username, String password) {

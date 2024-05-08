@@ -6,4 +6,16 @@ public class User {
     private String email;
     private String image;
     private Set[] sets;
+
+    public String getUsername() {
+        return this.username;
+    }
+
+    public String getImage() {
+        return this.image;
+    }
+
+    public void setImage(String image) {
+        this.image = image;
+    }
 }

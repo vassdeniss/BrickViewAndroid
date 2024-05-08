@@ -1,5 +1,7 @@
 package com.vassdeniss.brickview.ui.login;
 
+import static androidx.navigation.fragment.FragmentKt.findNavController;
+
 import androidx.lifecycle.ViewModelProvider;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -17,6 +19,7 @@ import android.widget.EditText;
 import android.widget.ProgressBar;
 import android.widget.Toast;
 
+import com.vassdeniss.brickview.BottomNavigationHelper;
 import com.vassdeniss.brickview.databinding.FragmentLoginBinding;
 
 import com.vassdeniss.brickview.R;
@@ -113,13 +116,14 @@ public class LoginFragment extends Fragment {
         });
     }
 
-    // TODO: finish
     private void updateUiWithUser(LoggedInUserView model) {
-        String welcome = getString(R.string.welcome) + model.getDisplayName();
-        // TODO : initiate successful logged in experience
+        String welcome = getString(R.string.welcome) + " " + model.getDisplayName();
         if (getContext() != null && getContext().getApplicationContext() != null) {
             Toast.makeText(getContext().getApplicationContext(), welcome, Toast.LENGTH_LONG).show();
         }
+
+        findNavController(this).navigate(R.id.action_login_to_profile);
+        BottomNavigationHelper.updateNav(getActivity());
     }
 
     private void showLoginFailed(String errorString) {

@@ -1,10 +1,10 @@
 package com.vassdeniss.brickview.data.model;
 
-public class JwtTokens {
+public class Tokens {
     private String accessToken;
     private String refreshToken;
 
-    public JwtTokens(String accessToken, String refreshToken) {
+    public Tokens(String accessToken, String refreshToken) {
         this.accessToken = accessToken;
         this.refreshToken = refreshToken;
     }
