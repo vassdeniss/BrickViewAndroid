@@ -1,16 +1,21 @@
 package com.vassdeniss.brickview.ui.profile;
 
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
+import android.util.Base64;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
 import com.vassdeniss.brickview.R;
+import com.vassdeniss.brickview.data.UserRepository;
+import com.vassdeniss.brickview.data.model.User;
 import com.vassdeniss.brickview.databinding.FragmentProfileBinding;
 
 /**
@@ -65,5 +70,22 @@ public class ProfileFragment extends Fragment {
                              Bundle savedInstanceState) {
         this.binding = FragmentProfileBinding.inflate(inflater, container, false);
         return this.binding.getRoot();
+    }
+
+    @Override
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+
+        final UserRepository repo = UserRepository.getInstance();
+        final User user = repo.getLoggedInUser();
+        final String image = user.getImage();
+
+        final String pureBase64Encoded = image.substring(image.indexOf(",")  + 1);
+        final byte[] decodedBytes = Base64.decode(pureBase64Encoded, Base64.DEFAULT);
+        final Bitmap bitmap = BitmapFactory.decodeByteArray(decodedBytes, 0, decodedBytes.length);
+        this.binding.avatarImageView.setImageBitmap(bitmap);
+
+        final String username = UserRepository.getInstance().getLoggedInUser().getUsername();
+        this.binding.usernameTextview.setText("Hello " + username);
     }
 }
