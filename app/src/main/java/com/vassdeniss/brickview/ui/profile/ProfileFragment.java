@@ -1,5 +1,7 @@
 package com.vassdeniss.brickview.ui.profile;
 
+import static androidx.navigation.fragment.FragmentKt.findNavController;
+
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Bundle;
@@ -13,6 +15,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.vassdeniss.brickview.BottomNavigationHelper;
 import com.vassdeniss.brickview.R;
 import com.vassdeniss.brickview.data.UserRepository;
 import com.vassdeniss.brickview.data.model.User;
@@ -87,5 +90,11 @@ public class ProfileFragment extends Fragment {
 
         final String username = UserRepository.getInstance().getLoggedInUser().getUsername();
         this.binding.usernameTextview.setText("Hello " + username);
+
+        this.binding.logoutButton.setOnClickListener(v -> {
+            repo.logout();
+            findNavController(this).navigate(R.id.action_profile_to_home);
+            BottomNavigationHelper.updateNav(getActivity());
+        });
     }
 }
