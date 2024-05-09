@@ -12,6 +12,7 @@ navigationFragment = "2.6.0"
 navigationUi = "2.6.0"
 annotation = "1.6.0"
 volley = "1.2.1"
+blurimageview = "1.0.1"
 
 [libraries]
 junit = { group = "junit", name = "junit", version.ref = "junit" }
@@ -26,6 +27,7 @@ navigation-fragment = { group = "androidx.navigation", name = "navigation-fragme
 navigation-ui = { group = "androidx.navigation", name = "navigation-ui", version.ref = "navigationUi" }
 annotation = { group = "androidx.annotation", name = "annotation", version.ref = "annotation" }
 volley = { group = "com.android.volley", name = "volley", version.ref = "volley" }
+blurimageview = { group = "com.github.jgabrielfreitas", name = "BlurImageView", version.ref = "blurimageview" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

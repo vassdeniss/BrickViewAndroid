@@ -2,14 +2,18 @@ package com.vassdeniss.brickview.ui.login;
 
 import static androidx.navigation.fragment.FragmentKt.findNavController;
 
+import androidx.annotation.DrawableRes;
+import androidx.core.content.res.ResourcesCompat;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -71,6 +75,7 @@ public class LoginFragment extends Fragment {
                 return;
             }
 
+            loginButton.setVisibility(View.VISIBLE);
             loadingProgressBar.setVisibility(View.GONE);
             if (loginResult.getError() != null) {
                 this.showLoginFailed(loginResult.getError());
@@ -110,6 +115,7 @@ public class LoginFragment extends Fragment {
         });
 
         loginButton.setOnClickListener(v -> {
+            loginButton.setVisibility(View.INVISIBLE);
             loadingProgressBar.setVisibility(View.VISIBLE);
             loginViewModel.login(usernameEditText.getText().toString(),
                     passwordEditText.getText().toString(), requireContext());

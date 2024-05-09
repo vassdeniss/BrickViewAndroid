@@ -11,7 +11,6 @@ import androidx.navigation.Navigation;
 import androidx.navigation.ui.AppBarConfiguration;
 import androidx.navigation.ui.NavigationUI;
 
-import com.vassdeniss.brickview.data.UserRepository;
 import com.vassdeniss.brickview.databinding.ActivityMainBinding;
 
 public class MainActivity extends AppCompatActivity {
@@ -33,5 +32,7 @@ public class MainActivity extends AppCompatActivity {
         NavigationUI.setupWithNavController(navView, navController);
 
         BottomNavigationHelper.updateNav(this);
+
+        
     }
 }

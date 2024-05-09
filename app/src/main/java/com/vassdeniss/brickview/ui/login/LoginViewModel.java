@@ -7,6 +7,7 @@ import androidx.lifecycle.ViewModel;
 import android.content.Context;
 import android.util.Patterns;
 
+import com.android.volley.DefaultRetryPolicy;
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.toolbox.JsonObjectRequest;
@@ -76,6 +77,10 @@ public class LoginViewModel extends ViewModel {
         StringRequest healthRequest = new StringRequest(Request.Method.GET, url + "/health",
                 response -> queue.add(request), null);
 
+        healthRequest.setRetryPolicy(new DefaultRetryPolicy(
+                20000,
+                DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
+                DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
 
         queue.add(healthRequest);
     }

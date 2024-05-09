@@ -32,7 +32,6 @@ android {
 }
 
 dependencies {
-
     implementation(libs.appcompat)
     implementation(libs.material)
     implementation(libs.constraintlayout)
@@ -43,6 +42,7 @@ dependencies {
     implementation(libs.annotation)
     implementation(libs.volley)
     implementation("com.google.code.gson:gson:2.10.1")
+    implementation(libs.blurimageview)
     testImplementation(libs.junit)
     androidTestImplementation(libs.ext.junit)
     androidTestImplementation(libs.espresso.core)
