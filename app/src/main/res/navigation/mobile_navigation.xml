@@ -19,10 +19,19 @@
             app:destination="@id/navigation_profile" />
     </fragment>
     <fragment
+        android:id="@+id/navigation_register"
+        android:name="com.vassdeniss.brickview.ui.register.RegisterFragment"
+        android:label="@string/title_register"
+        tools:layout="@layout/fragment_register">
+        <action
+            android:id="@+id/action_register_to_profile"
+            app:destination="@id/navigation_profile" />
+    </fragment>
+    <fragment
         android:id="@+id/navigation_profile"
         android:name="com.vassdeniss.brickview.ui.profile.ProfileFragment"
-        android:label="Profile"
-        tools:layout="@layout/activity_profile">
+        android:label="@string/title_profile"
+        tools:layout="@layout/fragment_profile">
         <action
             android:id="@+id/action_profile_to_home"
             app:destination="@id/navigation_home" />

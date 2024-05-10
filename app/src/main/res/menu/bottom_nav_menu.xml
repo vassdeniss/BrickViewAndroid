@@ -9,7 +9,11 @@
         android:icon="@android:drawable/ic_lock_idle_lock"
         android:title="@string/title_login" />
     <item
+        android:id="@+id/navigation_register"
+        android:icon="@android:drawable/ic_lock_idle_lock"
+        android:title="@string/title_register" />
+    <item
         android:id="@+id/navigation_profile"
         android:icon="@android:drawable/ic_menu_myplaces"
-        android:title="Profile" />
+        android:title="@string/title_profile" />
 </menu>

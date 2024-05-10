@@ -12,13 +12,16 @@ public class BottomNavigationHelper {
         BottomNavigationView navView = activity.findViewById(R.id.nav_view);
         MenuItem profile = navView.getMenu().findItem(R.id.navigation_profile);
         MenuItem login = navView.getMenu().findItem(R.id.navigation_login);
+        MenuItem register = navView.getMenu().findItem(R.id.navigation_register);
         boolean isLogged = UserRepository.getInstance().isLoggedIn();
         if (isLogged) {
             profile.setVisible(true);
             login.setVisible(false);
+            register.setVisible(false);
         } else {
             profile.setVisible(false);
             login.setVisible(true);
+            register.setVisible(true);
         }
     }
 }
