@@ -42,6 +42,7 @@ public class RegisterFragment extends Fragment {
                 .get(RegisterViewModel.class);
 
         final EditText usernameEditText = this.binding.username;
+        final EditText emailEditText = this.binding.email;
         final EditText passwordEditText = this.binding.password;
         final EditText repeatPasswordEditText = this.binding.repeatPassword;
 
@@ -52,6 +53,10 @@ public class RegisterFragment extends Fragment {
 
             if (registerFormState.getUsernameError() != null) {
                 usernameEditText.setError(this.getString(registerFormState.getUsernameError()));
+            }
+
+            if (registerFormState.getEmailError() != null) {
+                emailEditText.setError(this.getString(registerFormState.getEmailError()));
             }
 
             if (registerFormState.getPasswordError() != null) {
@@ -92,12 +97,14 @@ public class RegisterFragment extends Fragment {
             public void afterTextChanged(Editable s) {
                 registerViewModel.registerDataChanged(
                         usernameEditText.getText().toString(),
+                        emailEditText.getText().toString(),
                         passwordEditText.getText().toString(),
                         repeatPasswordEditText.getText().toString());
             }
         };
 
         usernameEditText.addTextChangedListener(afterTextChangedListener);
+        emailEditText.addTextChangedListener(afterTextChangedListener);
         passwordEditText.addTextChangedListener(afterTextChangedListener);
         repeatPasswordEditText.addTextChangedListener(afterTextChangedListener);
     }

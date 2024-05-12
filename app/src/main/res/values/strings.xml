@@ -13,6 +13,7 @@
 
     <string name="invalid_username">Not a valid username</string>
     <string name="short_username">Username must be at least 4 characters</string>
+    <string name="invalid_email">Not a valid email</string>
     <string name="invalid_password">Not a valid password</string>
     <string name="short_password">Password must be at least 8 characters</string>
     <string name="password_mismatch">Passwords mismatch</string>
