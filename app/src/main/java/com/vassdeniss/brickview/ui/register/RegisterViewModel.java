@@ -18,9 +18,15 @@ public class RegisterViewModel extends ViewModel {
         return this.registerResult;
     }
 
-    public void registerDataChanged(String username) {
+    public void registerDataChanged(String username, String password) {
         if (!this.isUserNameValid(username)) {
-            registerFormState.setValue(new RegisterFormState(R.string.invalid_username));
+            registerFormState.setValue(new RegisterFormState(R.string.invalid_username, null));
+        } else if (this.isUserNameShort(username)) {
+            registerFormState.setValue(new RegisterFormState(R.string.short_username, null));
+        } else if (!this.isPasswordValid(password)) {
+            registerFormState.setValue(new RegisterFormState(null, R.string.invalid_password));
+        } else if (this.isPasswordShort(password)) {
+            registerFormState.setValue(new RegisterFormState(null, R.string.short_password));
         }
     }
 
@@ -29,10 +35,22 @@ public class RegisterViewModel extends ViewModel {
             return false;
         }
 
-        if (username.trim().isEmpty()) {
+        return !username.trim().isEmpty();
+    }
+
+    private boolean isUserNameShort(String username) {
+        return username.length() < 4;
+    }
+
+    private boolean isPasswordValid(String password) {
+        if (password == null) {
             return false;
         }
 
-        return username.length() >= 4;
+        return !password.trim().isEmpty();
+    }
+
+    private boolean isPasswordShort(String password) {
+        return password.length() < 8;
     }
 }
