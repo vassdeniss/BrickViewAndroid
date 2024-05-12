@@ -1,20 +1,20 @@
-package com.vassdeniss.brickview.ui.login;
+package com.vassdeniss.brickview.ui.register;
 
 import androidx.annotation.Nullable;
 
 import com.vassdeniss.brickview.ui.LoggedInUserView;
 
-class LoginResult {
+class RegisterResult {
     @Nullable
     private LoggedInUserView success;
     @Nullable
     private String error;
 
-    LoginResult(@Nullable String error) {
+    RegisterResult(@Nullable String error) {
         this.error = error;
     }
 
-    LoginResult(@Nullable LoggedInUserView success) {
+    RegisterResult(@Nullable LoggedInUserView success) {
         this.success = success;
     }
 

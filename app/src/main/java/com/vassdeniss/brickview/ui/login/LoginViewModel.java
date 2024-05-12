@@ -5,7 +5,6 @@ import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
 import android.content.Context;
-import android.util.Patterns;
 
 import com.android.volley.DefaultRetryPolicy;
 import com.android.volley.Request;
@@ -17,6 +16,7 @@ import com.google.gson.Gson;
 import com.vassdeniss.brickview.R;
 import com.vassdeniss.brickview.data.UserRepository;
 import com.vassdeniss.brickview.data.model.Response;
+import com.vassdeniss.brickview.ui.LoggedInUserView;
 
 import org.json.JSONException;
 import org.json.JSONObject;

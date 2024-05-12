@@ -2,18 +2,14 @@ package com.vassdeniss.brickview.ui.login;
 
 import static androidx.navigation.fragment.FragmentKt.findNavController;
 
-import androidx.annotation.DrawableRes;
-import androidx.core.content.res.ResourcesCompat;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
-import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -27,6 +23,7 @@ import com.vassdeniss.brickview.BottomNavigationHelper;
 import com.vassdeniss.brickview.databinding.FragmentLoginBinding;
 
 import com.vassdeniss.brickview.R;
+import com.vassdeniss.brickview.ui.LoggedInUserView;
 
 public class LoginFragment extends Fragment {
     private LoginViewModel loginViewModel;
@@ -37,7 +34,6 @@ public class LoginFragment extends Fragment {
     public View onCreateView(@NonNull LayoutInflater inflater,
                              @Nullable ViewGroup container,
                              @Nullable Bundle savedInstanceState) {
-
         this.binding = FragmentLoginBinding.inflate(inflater, container, false);
         return this.binding.getRoot();
     }
