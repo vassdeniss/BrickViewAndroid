@@ -43,6 +43,7 @@ public class RegisterFragment extends Fragment {
 
         final EditText usernameEditText = this.binding.username;
         final EditText passwordEditText = this.binding.password;
+        final EditText repeatPasswordEditText = this.binding.repeatPassword;
 
         this.registerViewModel.getRegisterFormState().observe(this.getViewLifecycleOwner(), registerFormState -> {
             if (registerFormState == null) {
@@ -55,6 +56,10 @@ public class RegisterFragment extends Fragment {
 
             if (registerFormState.getPasswordError() != null) {
                 passwordEditText.setError(this.getString(registerFormState.getPasswordError()));
+            }
+
+            if (registerFormState.getRepeatPasswordError() != null) {
+                repeatPasswordEditText.setError(this.getString(registerFormState.getRepeatPasswordError()));
             }
         });
 
@@ -85,12 +90,16 @@ public class RegisterFragment extends Fragment {
 
             @Override
             public void afterTextChanged(Editable s) {
-                registerViewModel.registerDataChanged(usernameEditText.getText().toString(), passwordEditText.getText().toString());
+                registerViewModel.registerDataChanged(
+                        usernameEditText.getText().toString(),
+                        passwordEditText.getText().toString(),
+                        repeatPasswordEditText.getText().toString());
             }
         };
 
         usernameEditText.addTextChangedListener(afterTextChangedListener);
         passwordEditText.addTextChangedListener(afterTextChangedListener);
+        repeatPasswordEditText.addTextChangedListener(afterTextChangedListener);
     }
 
     private void updateUiWithUser(LoggedInUserView model) {

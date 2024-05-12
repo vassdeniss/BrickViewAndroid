@@ -18,39 +18,43 @@ public class RegisterViewModel extends ViewModel {
         return this.registerResult;
     }
 
-    public void registerDataChanged(String username, String password) {
-        if (!this.isUserNameValid(username)) {
-            registerFormState.setValue(new RegisterFormState(R.string.invalid_username, null));
-        } else if (this.isUserNameShort(username)) {
-            registerFormState.setValue(new RegisterFormState(R.string.short_username, null));
-        } else if (!this.isPasswordValid(password)) {
-            registerFormState.setValue(new RegisterFormState(null, R.string.invalid_password));
-        } else if (this.isPasswordShort(password)) {
-            registerFormState.setValue(new RegisterFormState(null, R.string.short_password));
+    public void registerDataChanged(String username, String password, String repeatPassword) {
+        if (this.isFieldInvalid(username)) {
+            registerFormState.setValue(new RegisterFormState(R.string.invalid_username, null, null));
+        } else if (this.isFieldShort(username, 4)) {
+            registerFormState.setValue(new RegisterFormState(R.string.short_username, null, null));
+        }
+
+        if (this.isFieldInvalid(password)) {
+            registerFormState.setValue(new RegisterFormState(null, R.string.invalid_password, null));
+        } else if (this.isFieldShort(password, 8)) {
+            registerFormState.setValue(new RegisterFormState(null, R.string.short_password, null));
+        }
+
+        if (this.isFieldInvalid(repeatPassword)) {
+            registerFormState.setValue(new RegisterFormState(null, null, R.string.invalid_password));
+        } else if (this.doPasswordsMismatch(password, repeatPassword)) {
+            registerFormState.setValue(new RegisterFormState(null, null, R.string.password_mismatch));
         }
     }
 
-    private boolean isUserNameValid(String username) {
-        if (username == null) {
-            return false;
+    private boolean isFieldInvalid(String field) {
+        if (field == null) {
+            return true;
         }
 
-        return !username.trim().isEmpty();
+        return field.trim().isEmpty();
     }
 
-    private boolean isUserNameShort(String username) {
-        return username.length() < 4;
+    private boolean isFieldShort(String field, int length) {
+        return field.length() < length;
     }
 
-    private boolean isPasswordValid(String password) {
+    private boolean doPasswordsMismatch(String password, String repeatPassword) {
         if (password == null) {
-            return false;
+            return true;
         }
 
-        return !password.trim().isEmpty();
-    }
-
-    private boolean isPasswordShort(String password) {
-        return password.length() < 8;
+        return !password.equals(repeatPassword);
     }
 }

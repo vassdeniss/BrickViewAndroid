@@ -15,6 +15,7 @@
     <string name="short_username">Username must be at least 4 characters</string>
     <string name="invalid_password">Not a valid password</string>
     <string name="short_password">Password must be at least 8 characters</string>
+    <string name="password_mismatch">Passwords mismatch</string>
 
     <string name="login_failed">"Login failed"</string>
     <!-- Strings related to login -->
