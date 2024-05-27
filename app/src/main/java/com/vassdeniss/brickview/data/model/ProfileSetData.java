@@ -8,12 +8,12 @@ public class ProfileSetData {
     private final String name;
     private final String image;
 
-    public ProfileSetData(String setId, String year, String name, String image, String parts) {
-        this._id = setId;
-        this.year = year;
-        this.name = name;
-        this.image = image;
-        this.parts = parts;
+    public ProfileSetData(Set set) {
+        this._id = set.getSetId();
+        this.year = String.valueOf(set.getYear());
+        this.name = set.getName();
+        this.image = set.getImage();
+        this.parts = String.valueOf(set.getParts());
     }
 
     public String getSetId() {
