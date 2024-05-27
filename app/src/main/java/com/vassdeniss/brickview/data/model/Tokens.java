@@ -8,4 +8,12 @@ public class Tokens {
         this.accessToken = accessToken;
         this.refreshToken = refreshToken;
     }
+
+    public String getAccessToken() {
+        return this.accessToken;
+    }
+
+    public String getRefreshToken() {
+        return this.refreshToken;
+    }
 }

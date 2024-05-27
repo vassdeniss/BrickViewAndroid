@@ -6,6 +6,7 @@ public class User {
     private String email;
     private String image;
     private Set[] sets;
+    private Tokens tokens;
 
     public String getUsername() {
         return this.username;
@@ -13,6 +14,18 @@ public class User {
 
     public String getImage() {
         return this.image;
+    }
+
+    public Tokens getTokens() {
+        return this.tokens;
+    }
+
+    public Set[] getSets() {
+        return this.sets;
+    }
+
+    public void setTokens(Tokens tokens) {
+        this.tokens = tokens;
     }
 
     public void setImage(String image) {

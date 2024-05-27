@@ -8,7 +8,7 @@ android {
 
     defaultConfig {
         applicationId = "com.vassdeniss.brickview"
-        minSdk = 26
+        minSdk = 31
         targetSdk = 34
         versionCode = 1
         versionName = "1.0"
@@ -42,6 +42,7 @@ dependencies {
     implementation(libs.annotation)
     implementation(libs.volley)
     implementation("com.google.code.gson:gson:2.10.1")
+    implementation("com.github.bumptech.glide:glide:4.12.0")
     implementation(libs.blurimageview)
     testImplementation(libs.junit)
     androidTestImplementation(libs.ext.junit)

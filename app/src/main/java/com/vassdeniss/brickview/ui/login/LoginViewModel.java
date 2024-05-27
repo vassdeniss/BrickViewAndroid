@@ -16,6 +16,7 @@ import com.google.gson.Gson;
 import com.vassdeniss.brickview.R;
 import com.vassdeniss.brickview.data.UserRepository;
 import com.vassdeniss.brickview.data.model.Response;
+import com.vassdeniss.brickview.data.model.Tokens;
 import com.vassdeniss.brickview.ui.LoggedInUserView;
 
 import org.json.JSONException;
@@ -24,7 +25,7 @@ import org.json.JSONObject;
 public class LoginViewModel extends ViewModel {
     private final MutableLiveData<LoginFormState> loginFormState = new MutableLiveData<>();
     private final MutableLiveData<LoginResult> loginResult = new MutableLiveData<>();
-    private UserRepository userRepository;
+    private final UserRepository userRepository;
 
     LoginViewModel(UserRepository userRepository) {
         this.userRepository = userRepository;
@@ -58,6 +59,7 @@ public class LoginViewModel extends ViewModel {
                     Gson gson = new Gson();
                     Response res = gson.fromJson(response.toString(), Response.class);
                     res.user.setImage(res.image);
+                    res.user.setTokens(res.tokens);
                     this.userRepository.setLoggedInUser(res.user);
                     this.loginResult.setValue(new LoginResult(new LoggedInUserView(res.user.getUsername())));
                 },
