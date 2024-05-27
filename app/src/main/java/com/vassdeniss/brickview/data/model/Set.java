@@ -20,6 +20,10 @@ public class Set {
         return this.name;
     }
 
+    public String getSetId() {
+        return this._id;
+    }
+
     public String getImage() {
         return this.image;
     }

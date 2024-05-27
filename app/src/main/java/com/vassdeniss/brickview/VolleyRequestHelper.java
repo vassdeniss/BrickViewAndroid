@@ -58,6 +58,13 @@ public class VolleyRequestHelper {
         this.makeRequest(Request.Method.POST, url, headers, body, callback);
     }
 
+    public void makeDeleteRequest(String url,
+                                Map<String, String> headers,
+                                @Nullable JSONObject body,
+                                VolleyCallback<JSONObject> callback) {
+        this.makeRequest(Request.Method.DELETE, url, headers, body, callback);
+    }
+
     public Map<String, String> makeTokenHeaders(String access, String refresh) {
         Map<String, String> headers = new HashMap<>();
         headers.put("X-Authorization", access);
