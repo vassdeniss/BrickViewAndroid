@@ -1,6 +1,7 @@
 package com.vassdeniss.brickview.ui.home;
 
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -12,13 +13,16 @@ import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.android.volley.Request;
 import com.android.volley.VolleyError;
 import com.google.gson.Gson;
+import com.google.gson.JsonArray;
 import com.vassdeniss.brickview.VolleyRequestHelper;
 import com.vassdeniss.brickview.data.model.SetAdapter;
 import com.vassdeniss.brickview.data.model.SetData;
 import com.vassdeniss.brickview.databinding.FragmentHomeBinding;
 
+import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
@@ -47,11 +51,9 @@ public class HomeFragment extends Fragment {
         this.adapter = new SetAdapter(getContext(), this.data);
         this.view.setAdapter(this.adapter);
 
-        VolleyRequestHelper helper = VolleyRequestHelper.getInstance(this.getContext());
-
-        helper.makeGetRequest("/sets/allWithReviews", null, new VolleyRequestHelper.VolleyCallback<JSONObject>() {
+        VolleyRequestHelper.VolleyCallback<JSONArray> callbacks = new VolleyRequestHelper.VolleyCallback<JSONArray>() {
             @Override
-            public void onSuccess(JSONObject result) {
+            public void onSuccess(JSONArray result) {
                 Gson gson = new Gson();
                 SetData[] setData = gson.fromJson(result.toString(), SetData[].class);
                 Collections.addAll(data, setData);
@@ -59,8 +61,17 @@ public class HomeFragment extends Fragment {
             }
 
             @Override
-            public void onError(VolleyError error) { }
-        });
+            public void onError(VolleyError error) {
+                Log.d("a", "A");
+            }
+        };
+
+        new VolleyRequestHelper.ArrayBuilder()
+                .setContext(this.getContext())
+                .useMethod(Request.Method.GET)
+                .toUrl("/sets/allWithReviews")
+                .addCallback(callbacks)
+                .execute();
 
         return root;
     }

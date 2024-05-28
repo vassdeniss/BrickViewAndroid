@@ -35,11 +35,11 @@ public class UserRepository {
         this.user = user;
     }
 
-    public void updateUser(JSONObject result) {
-        Gson gson = new Gson();
-        Response res = gson.fromJson(result.toString(), Response.class);
-        res.user.setImage(res.image);
-        res.user.setTokens(res.tokens);
-        this.setLoggedInUser(res.user);
+    public void updateUser(User newUser) {
+        User user = this.getLoggedInUser();
+        user.setId(newUser.getId());
+        user.setUsername(newUser.getUsername());
+        user.setEmail(newUser.getEmail());
+        user.setSets(newUser.getSets());
     }
 }

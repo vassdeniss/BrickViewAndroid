@@ -8,8 +8,28 @@ public class User {
     private Set[] sets;
     private Tokens tokens;
 
+    public String getId() {
+        return this._id;
+    }
+
+    public void setId(String id) {
+        this._id = id;
+    }
+
     public String getUsername() {
         return this.username;
+    }
+
+    public void setUsername(String username) {
+        this.username = username;
+    }
+
+    public String getEmail() {
+        return this.email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
     }
 
     public String getImage() {
@@ -22,6 +42,10 @@ public class User {
 
     public Set[] getSets() {
         return this.sets;
+    }
+
+    public void setSets(Set[] sets) {
+        this.sets = sets;
     }
 
     public void setTokens(Tokens tokens) {

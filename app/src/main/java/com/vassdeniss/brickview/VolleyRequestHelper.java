@@ -10,15 +10,19 @@ import com.android.volley.DefaultRetryPolicy;
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.VolleyError;
+import com.android.volley.toolbox.JsonArrayRequest;
 import com.android.volley.toolbox.JsonObjectRequest;
+import com.android.volley.toolbox.JsonRequest;
 import com.android.volley.toolbox.Volley;
 import com.vassdeniss.brickview.data.model.Tokens;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 
 public class VolleyRequestHelper {
     private static VolleyRequestHelper instance;
@@ -48,12 +52,6 @@ public class VolleyRequestHelper {
         return this.requestQueue;
     }
 
-    public void makeGetRequest(String url,
-                               @Nullable Map<String, String> headers,
-                               VolleyCallback<JSONObject> callback) {
-        this.makeRequest(Request.Method.GET, url, headers, null, callback);
-    }
-
     public Map<String, String> makeTokenHeaders(Tokens tokens) {
         Map<String, String> headers = new HashMap<>();
         headers.put("X-Authorization", tokens.getAccessToken());
@@ -61,17 +59,18 @@ public class VolleyRequestHelper {
         return headers;
     }
 
-    public void defaultErrorCallback(VolleyError error) {
+    public String defaultErrorCallback(VolleyError error) {
         if (error.networkResponse != null && error.networkResponse.data != null) {
             try {
                 String errorMessage = new String(error.networkResponse.data);
                 JSONObject jsonObject = new JSONObject(errorMessage);
-                String message = jsonObject.getString("message");
-                Toast.makeText(ctx, message, Toast.LENGTH_LONG).show();
+                return jsonObject.getString("message");
             } catch (JSONException e) {
                 e.printStackTrace();
             }
         }
+
+        return "";
     }
 
     public JSONObject createBody(String... params) {
@@ -108,6 +107,23 @@ public class VolleyRequestHelper {
         };
 
         this.getRequestQueue().add(jsonObjectRequest);
+    }
+
+    private void makeArrayRequest(
+            int method,
+            String url,
+            @Nullable Map<String, String> headers,
+            VolleyCallback<JSONArray> callback) {
+        JsonArrayRequest jsonArrayRequest = new JsonArrayRequest(method, this.baseUrl + url, null,
+                callback::onSuccess,
+                callback::onError) {
+            @Override
+            public Map<String, String> getHeaders() throws AuthFailureError {
+                return headers != null ? headers : super.getHeaders();
+            }
+        };
+
+        this.getRequestQueue().add(jsonArrayRequest);
     }
 
     public interface VolleyCallback<T> {
@@ -156,6 +172,44 @@ public class VolleyRequestHelper {
         public void execute() {
             VolleyRequestHelper helper = VolleyRequestHelper.getInstance(this.ctx);
             helper.makeRequest(this.method, this.url, this.headers, this.body, this.callback);
+        }
+    }
+
+    public static class ArrayBuilder {
+        private Context ctx;
+        private int method;
+        private String url;
+        private Map<String, String> headers;
+        private VolleyCallback<JSONArray> callback;
+
+        public ArrayBuilder setContext(Context ctx) {
+            this.ctx = ctx;
+            return this;
+        }
+
+        public ArrayBuilder useMethod(int method) {
+            this.method = method;
+            return this;
+        }
+
+        public ArrayBuilder toUrl(String url) {
+            this.url = url;
+            return this;
+        }
+
+        public ArrayBuilder withHeaders(Map<String, String> headers) {
+            this.headers = headers;
+            return this;
+        }
+
+        public ArrayBuilder addCallback(VolleyCallback<JSONArray> callback) {
+            this.callback = callback;
+            return this;
+        }
+
+        public void execute() {
+            VolleyRequestHelper helper = VolleyRequestHelper.getInstance(this.ctx);
+            helper.makeArrayRequest(this.method, this.url, this.headers, this.callback);
         }
     }
 }

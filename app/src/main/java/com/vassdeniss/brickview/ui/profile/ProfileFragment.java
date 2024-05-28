@@ -23,9 +23,11 @@ import android.util.Base64;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
 
 import com.android.volley.Request;
 import com.android.volley.VolleyError;
+import com.google.gson.Gson;
 import com.vassdeniss.brickview.BottomNavigationHelper;
 import com.vassdeniss.brickview.R;
 import com.vassdeniss.brickview.VolleyRequestHelper;
@@ -36,10 +38,12 @@ import com.vassdeniss.brickview.data.model.Set;
 import com.vassdeniss.brickview.data.model.User;
 import com.vassdeniss.brickview.databinding.FragmentProfileBinding;
 
+import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 public class ProfileFragment extends Fragment {
     private FragmentProfileBinding binding;
@@ -102,10 +106,19 @@ public class ProfileFragment extends Fragment {
     private void addSet(List<ProfileSetData> data, ProfileSetAdapter adapter) {
         this.binding.addSetButton.setEnabled(false);
         this.binding.loading.setVisibility(View.VISIBLE);
+        String setId = this.binding.setNumberTextView.getText().toString();
+        this.binding.setNumberTextView.setText("");
+
         VolleyRequestHelper.VolleyCallback<JSONObject> callbacks = new VolleyRequestHelper.VolleyCallback<JSONObject>() {
             @Override
             public void onSuccess(JSONObject result) {
-                userRepository.updateUser(result);
+                Gson gson = new Gson();
+                User user = null;
+                try {
+                    user = gson.fromJson(result.get("user").toString(), User.class);
+                } catch (JSONException ignored) { }
+
+                userRepository.updateUser(user);
                 updateUi();
                 data.clear();
                 for (Set set : userRepository.getLoggedInUser().getSets()) {
@@ -116,7 +129,10 @@ public class ProfileFragment extends Fragment {
 
             @Override
             public void onError(VolleyError error) {
-                helper.defaultErrorCallback(error);
+                String message = helper.defaultErrorCallback(error);
+                if (!Objects.equals(message, "")) {
+                    Toast.makeText(getContext(), message, Toast.LENGTH_LONG).show();
+                }
                 updateUi();
             }
 
@@ -131,7 +147,7 @@ public class ProfileFragment extends Fragment {
                 .useMethod(Request.Method.POST)
                 .toUrl("/sets/add-set")
                 .withHeaders(helper.makeTokenHeaders(userRepository.getLoggedInUser().getTokens()))
-                .withBody(helper.createBody("setId", this.binding.setNumberTextView.getText().toString()))
+                .withBody(helper.createBody("setId", setId))
                 .addCallback(callbacks)
                 .execute();
     }
@@ -142,14 +158,23 @@ public class ProfileFragment extends Fragment {
         VolleyRequestHelper.VolleyCallback<JSONObject> callbacks = new VolleyRequestHelper.VolleyCallback<JSONObject>() {
             @Override
             public void onSuccess(JSONObject result) {
-                userRepository.updateUser(result);
+                Gson gson = new Gson();
+                User user = null;
+                try {
+                    user = gson.fromJson(result.get("user").toString(), User.class);
+                } catch (JSONException ignored) { }
+
+                userRepository.updateUser(user);
                 adapter.removeItem(pos);
                 updateUi();
             }
 
             @Override
             public void onError(VolleyError error) {
-                helper.defaultErrorCallback(error);
+                String message = helper.defaultErrorCallback(error);
+                if (!Objects.equals(message, "")) {
+                    Toast.makeText(getContext(), message, Toast.LENGTH_LONG).show();
+                }
                 adapter.notifyItemChanged(pos);
                 updateUi();
             }

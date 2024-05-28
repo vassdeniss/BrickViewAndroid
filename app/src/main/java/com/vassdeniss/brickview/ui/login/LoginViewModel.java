@@ -5,22 +5,20 @@ import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
 import android.content.Context;
+import android.widget.Toast;
 
-import com.android.volley.DefaultRetryPolicy;
 import com.android.volley.Request;
-import com.android.volley.RequestQueue;
-import com.android.volley.toolbox.JsonObjectRequest;
-import com.android.volley.toolbox.StringRequest;
-import com.android.volley.toolbox.Volley;
+import com.android.volley.VolleyError;
 import com.google.gson.Gson;
 import com.vassdeniss.brickview.R;
+import com.vassdeniss.brickview.VolleyRequestHelper;
 import com.vassdeniss.brickview.data.UserRepository;
 import com.vassdeniss.brickview.data.model.Response;
-import com.vassdeniss.brickview.data.model.Tokens;
 import com.vassdeniss.brickview.ui.LoggedInUserView;
 
-import org.json.JSONException;
 import org.json.JSONObject;
+
+import java.util.Objects;
 
 public class LoginViewModel extends ViewModel {
     private final MutableLiveData<LoginFormState> loginFormState = new MutableLiveData<>();
@@ -40,51 +38,41 @@ public class LoginViewModel extends ViewModel {
     }
 
     public void login(String username, String password, Context context) {
-        String url = "https://brickview.api.vasspass.net";
+        VolleyRequestHelper helper = VolleyRequestHelper.getInstance(context);
 
-        JSONObject body = new JSONObject();
+        VolleyRequestHelper.VolleyCallback<JSONObject> callbacks = new VolleyRequestHelper.VolleyCallback<JSONObject>() {
+            @Override
+            public void onSuccess(JSONObject result) {
+                Gson gson = new Gson();
+                Response res = gson.fromJson(result.toString(), Response.class);
+                res.user.setImage(res.image);
+                res.user.setTokens(res.tokens);
+                userRepository.setLoggedInUser(res.user);
+                loginResult.setValue(
+                        new LoginResult(
+                                new LoggedInUserView(
+                                        userRepository.getLoggedInUser().getUsername()
+                                )
+                        )
+                );
+            }
 
-        try {
-            body.put("username", username);
-            body.put("password", password);
-        } catch (JSONException e) {
-            e.printStackTrace();
-            return;
-        }
+            @Override
+            public void onError(VolleyError error) {
+                String message = helper.defaultErrorCallback(error);
+                if (!Objects.equals(message, "")) {
+                    loginResult.setValue(new LoginResult(message));
+                }
+            }
+        };
 
-        RequestQueue queue = Volley.newRequestQueue(context);
-
-        JsonObjectRequest request = new JsonObjectRequest(Request.Method.POST, url + "/users/login", body,
-                response -> {
-                    Gson gson = new Gson();
-                    Response res = gson.fromJson(response.toString(), Response.class);
-                    res.user.setImage(res.image);
-                    res.user.setTokens(res.tokens);
-                    this.userRepository.setLoggedInUser(res.user);
-                    this.loginResult.setValue(new LoginResult(new LoggedInUserView(res.user.getUsername())));
-                },
-                error -> {
-                    if (error.networkResponse != null && error.networkResponse.data != null) {
-                        try {
-                            String errorMessage = new String(error.networkResponse.data);
-                            JSONObject jsonObject = new JSONObject(errorMessage);
-                            String message = jsonObject.getString("message");
-                            this.loginResult.setValue(new LoginResult(message));
-                        } catch (JSONException e) {
-                            e.printStackTrace();
-                        }
-                    }
-                });
-
-        StringRequest healthRequest = new StringRequest(Request.Method.GET, url + "/health",
-                response -> queue.add(request), null);
-
-        healthRequest.setRetryPolicy(new DefaultRetryPolicy(
-                20000,
-                DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
-                DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
-
-        queue.add(healthRequest);
+        new VolleyRequestHelper.Builder()
+                .setContext(context)
+                .useMethod(Request.Method.POST)
+                .toUrl("/users/login")
+                .withBody(helper.createBody("username", username, "password", password))
+                .addCallback(callbacks)
+                .execute();
     }
 
     public void loginDataChanged(String username, String password) {
