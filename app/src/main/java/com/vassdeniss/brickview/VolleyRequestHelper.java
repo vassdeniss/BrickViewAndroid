@@ -138,6 +138,7 @@ public class VolleyRequestHelper {
         private Map<String, String> headers;
         private JSONObject body;
         private VolleyCallback<JSONObject> callback;
+        private VolleyCallback<JSONArray> arrayCallback;
 
         public Builder setContext(Context ctx) {
             this.ctx = ctx;
@@ -169,47 +170,19 @@ public class VolleyRequestHelper {
             return this;
         }
 
-        public void execute() {
-            VolleyRequestHelper helper = VolleyRequestHelper.getInstance(this.ctx);
-            helper.makeRequest(this.method, this.url, this.headers, this.body, this.callback);
-        }
-    }
-
-    public static class ArrayBuilder {
-        private Context ctx;
-        private int method;
-        private String url;
-        private Map<String, String> headers;
-        private VolleyCallback<JSONArray> callback;
-
-        public ArrayBuilder setContext(Context ctx) {
-            this.ctx = ctx;
-            return this;
-        }
-
-        public ArrayBuilder useMethod(int method) {
-            this.method = method;
-            return this;
-        }
-
-        public ArrayBuilder toUrl(String url) {
-            this.url = url;
-            return this;
-        }
-
-        public ArrayBuilder withHeaders(Map<String, String> headers) {
-            this.headers = headers;
-            return this;
-        }
-
-        public ArrayBuilder addCallback(VolleyCallback<JSONArray> callback) {
-            this.callback = callback;
+        public Builder addArrayCallback(VolleyCallback<JSONArray> arrayCallback) {
+            this.arrayCallback = arrayCallback;
             return this;
         }
 
         public void execute() {
             VolleyRequestHelper helper = VolleyRequestHelper.getInstance(this.ctx);
-            helper.makeArrayRequest(this.method, this.url, this.headers, this.callback);
+
+            if (this.arrayCallback == null) {
+                helper.makeRequest(this.method, this.url, this.headers, this.body, this.callback);
+            } else {
+                helper.makeArrayRequest(this.method, this.url, this.headers, this.arrayCallback);
+            }
         }
     }
 }
