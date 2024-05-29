@@ -16,6 +16,10 @@ public class SetData {
         this.reviewDate = reviewData;
     }
 
+    public String getId() {
+        return this._id;
+    }
+
     public String getUsername() {
         return this.username;
     }

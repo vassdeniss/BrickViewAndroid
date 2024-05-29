@@ -9,8 +9,11 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
+import androidx.navigation.NavController;
+import androidx.navigation.fragment.FragmentKt;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.vassdeniss.brickview.R;
 import com.vassdeniss.brickview.data.model.SetAdapter;
 import com.vassdeniss.brickview.data.model.SetData;
 import com.vassdeniss.brickview.databinding.FragmentHomeBinding;
@@ -19,7 +22,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-public class HomeFragment extends Fragment {
+public class HomeFragment extends Fragment implements SetAdapter.OnItemClickListener {
     private FragmentHomeBinding binding;
 
     @Nullable
@@ -33,11 +36,10 @@ public class HomeFragment extends Fragment {
 
         RecyclerView view = this.binding.recyclerView;
         List<SetData> data = new ArrayList<>();
-        SetAdapter adapter = new SetAdapter(getContext(), data);
+        SetAdapter adapter = new SetAdapter(getContext(), data, this);
         view.setAdapter(adapter);
 
         homeViewModel.getAllSets(this.getContext());
-
         homeViewModel.getData().observe(this.getViewLifecycleOwner(), setData -> {
             if (setData == null) {
                 return;
@@ -55,5 +57,15 @@ public class HomeFragment extends Fragment {
     public void onDestroyView() {
         super.onDestroyView();
         this.binding = null;
+    }
+
+    @Override
+    public void onItemClick(String id) {
+        NavController navController = FragmentKt.findNavController(this);
+
+        Bundle bundle = new Bundle();
+        bundle.putString("_id", id);
+
+        navController.navigate(R.id.action_home_to_review, bundle);
     }
 }

@@ -21,12 +21,14 @@ import com.vassdeniss.brickview.R;
 import java.util.List;
 
 public class SetAdapter extends RecyclerView.Adapter<SetAdapter.ViewHolder> {
-    private List<SetData> data;
-    private Context context;
+    private final List<SetData> data;
+    private final Context context;
+    private final OnItemClickListener listener;
 
-    public SetAdapter(Context context, List<SetData> data) {
+    public SetAdapter(Context context, List<SetData> data, OnItemClickListener listener) {
         this.context = context;
         this.data = data;
+        this.listener = listener;
     }
 
     @NonNull
@@ -51,7 +53,11 @@ public class SetAdapter extends RecyclerView.Adapter<SetAdapter.ViewHolder> {
 
         holder.title.setText(text);
         holder.info.setText("Review by " + data.getUsername() + "\n" + data.getDate());
-        holder.grid.setOnClickListener(view -> Toast.makeText(view.getContext(), "click on item: " + data.getName(),Toast.LENGTH_LONG).show());
+        holder.grid.setOnClickListener(view -> {
+            if (this.listener != null) {
+                this.listener.onItemClick(data.getId());
+            }
+        });
 
         final String image = data.getUserImage();
         final String pureBase64Encoded = image.substring(image.indexOf(",")  + 1);
@@ -81,5 +87,9 @@ public class SetAdapter extends RecyclerView.Adapter<SetAdapter.ViewHolder> {
             this.grid = itemView.findViewById(R.id.set_layout);
             this.authorImage = itemView.findViewById(R.id.set_author_image);
         }
+    }
+
+    public interface OnItemClickListener {
+        void onItemClick(String id);
     }
 }

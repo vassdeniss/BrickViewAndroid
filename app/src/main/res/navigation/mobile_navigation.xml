@@ -8,7 +8,11 @@
         android:id="@+id/navigation_home"
         android:name="com.vassdeniss.brickview.ui.home.HomeFragment"
         android:label="@string/title_home"
-        tools:layout="@layout/fragment_home" />
+        tools:layout="@layout/fragment_home">
+        <action
+            android:id="@+id/action_home_to_review"
+            app:destination="@id/navigation_review" />
+    </fragment>
     <fragment
         android:id="@+id/navigation_login"
         android:name="com.vassdeniss.brickview.ui.login.LoginFragment"
@@ -35,5 +39,14 @@
         <action
             android:id="@+id/action_profile_to_home"
             app:destination="@id/navigation_home" />
+    </fragment>
+    <fragment
+        android:id="@+id/navigation_review"
+        android:name="com.vassdeniss.brickview.ui.review.ReviewFragment"
+        android:label="Review"
+        tools:layout="@layout/fragment_review">
+        <argument
+            android:name="_id"
+            app:argType="string" />
     </fragment>
 </navigation>
