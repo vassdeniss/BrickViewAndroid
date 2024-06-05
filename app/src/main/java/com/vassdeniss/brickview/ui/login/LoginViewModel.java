@@ -14,6 +14,7 @@ import com.vassdeniss.brickview.VolleyRequestHelper;
 import com.vassdeniss.brickview.data.UserRepository;
 import com.vassdeniss.brickview.data.model.Response;
 import com.vassdeniss.brickview.ui.LoggedInUserView;
+import com.vassdeniss.brickview.ui.Result;
 
 import org.json.JSONObject;
 
@@ -21,46 +22,40 @@ import java.util.Objects;
 
 public class LoginViewModel extends ViewModel {
     private final MutableLiveData<LoginFormState> loginFormState = new MutableLiveData<>();
-    private final MutableLiveData<LoginResult> loginResult = new MutableLiveData<>();
-    private final UserRepository userRepository;
+    private final MutableLiveData<Result> result = new MutableLiveData<>();
+    private final UserRepository userRepository = UserRepository.getInstance();
 
-    LoginViewModel(UserRepository userRepository) {
-        this.userRepository = userRepository;
-    }
-
-    LiveData<LoginFormState> getLoginFormState() {
+    public LiveData<LoginFormState> getLoginFormState() {
         return this.loginFormState;
     }
 
-    LiveData<LoginResult> getLoginResult() {
-        return this.loginResult;
+    public LiveData<Result> getResult() {
+        return this.result;
     }
 
-    public void login(String username, String password, Context context) {
-        VolleyRequestHelper helper = VolleyRequestHelper.getInstance(context);
-
-        VolleyRequestHelper.VolleyCallback<JSONObject> callbacks = new VolleyRequestHelper.VolleyCallback<JSONObject>() {
+    public void login(final String username,
+                      final String password,
+                      final Context context) {
+        final VolleyRequestHelper.VolleyCallback<JSONObject> callbacks = new VolleyRequestHelper.VolleyCallback<JSONObject>() {
             @Override
-            public void onSuccess(JSONObject result) {
-                Gson gson = new Gson();
-                Response res = gson.fromJson(result.toString(), Response.class);
+            public void onSuccess(final JSONObject jsonResult) {
+                final Gson gson = new Gson();
+                final Response res = gson.fromJson(jsonResult.toString(), Response.class);
                 res.user.setImage(res.image);
                 res.user.setTokens(res.tokens);
                 userRepository.setLoggedInUser(res.user);
-                loginResult.setValue(
-                        new LoginResult(
-                                new LoggedInUserView(
-                                        userRepository.getLoggedInUser().getUsername()
-                                )
-                        )
+
+                final String username = userRepository.getLoggedInUser().getUsername();
+                result.setValue(
+                        new Result(new LoggedInUserView(username))
                 );
             }
 
             @Override
-            public void onError(VolleyError error) {
-                String message = helper.defaultErrorCallback(error);
+            public void onError(final VolleyError error) {
+                final String message = VolleyRequestHelper.defaultErrorCallback(error);
                 if (!Objects.equals(message, "")) {
-                    loginResult.setValue(new LoginResult(message));
+                    result.setValue(new Result(message));
                 }
             }
         };
@@ -69,22 +64,22 @@ public class LoginViewModel extends ViewModel {
                 .setContext(context)
                 .useMethod(Request.Method.POST)
                 .toUrl("/users/login")
-                .withBody(helper.createBody("username", username, "password", password))
+                .withBody(VolleyRequestHelper.createBody("username", username, "password", password))
                 .addCallback(callbacks)
                 .execute();
     }
 
-    public void loginDataChanged(String username, String password) {
+    public void loginDataChanged(final String username, final String password) {
         if (!this.isUserNameValid(username)) {
-            loginFormState.setValue(new LoginFormState(R.string.invalid_username, null));
+            this.loginFormState.setValue(new LoginFormState(R.string.invalid_username, null));
         } else if (!this.isPasswordValid(password)) {
-            loginFormState.setValue(new LoginFormState(null, R.string.invalid_password));
+            this.loginFormState.setValue(new LoginFormState(null, R.string.invalid_password));
         } else {
-            loginFormState.setValue(new LoginFormState(true));
+            this.loginFormState.setValue(new LoginFormState(true));
         }
     }
 
-    private boolean isUserNameValid(String username) {
+    private boolean isUserNameValid(final String username) {
         if (username == null) {
             return false;
         }
@@ -92,7 +87,7 @@ public class LoginViewModel extends ViewModel {
         return !username.trim().isEmpty();
     }
 
-    private boolean isPasswordValid(String password) {
+    private boolean isPasswordValid(final String password) {
         return password != null;
     }
 }

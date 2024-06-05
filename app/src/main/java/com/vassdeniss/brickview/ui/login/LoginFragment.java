@@ -1,28 +1,25 @@
 package com.vassdeniss.brickview.ui.login;
 
-import static androidx.navigation.fragment.FragmentKt.findNavController;
-
-import androidx.lifecycle.ViewModelProvider;
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.fragment.app.Fragment;
-
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.inputmethod.EditorInfo;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ProgressBar;
 import android.widget.Toast;
 
-import com.vassdeniss.brickview.BottomNavigationHelper;
-import com.vassdeniss.brickview.databinding.FragmentLoginBinding;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.fragment.app.Fragment;
+import androidx.lifecycle.ViewModelProvider;
+import androidx.navigation.fragment.FragmentKt;
 
+import com.vassdeniss.brickview.BottomNavigationHelper;
 import com.vassdeniss.brickview.R;
+import com.vassdeniss.brickview.databinding.FragmentLoginBinding;
 import com.vassdeniss.brickview.ui.LoggedInUserView;
 
 public class LoginFragment extends Fragment {
@@ -66,7 +63,7 @@ public class LoginFragment extends Fragment {
             }
         });
 
-        this.loginViewModel.getLoginResult().observe(getViewLifecycleOwner(), loginResult -> {
+        this.loginViewModel.getResult().observe(getViewLifecycleOwner(), loginResult -> {
             if (loginResult == null) {
                 return;
             }
@@ -102,14 +99,6 @@ public class LoginFragment extends Fragment {
 
         usernameEditText.addTextChangedListener(afterTextChangedListener);
         passwordEditText.addTextChangedListener(afterTextChangedListener);
-        passwordEditText.setOnEditorActionListener((v, actionId, event) -> {
-            if (actionId == EditorInfo.IME_ACTION_DONE) {
-                loginViewModel.login(usernameEditText.getText().toString(),
-                        passwordEditText.getText().toString(), requireContext());
-            }
-            return false;
-        });
-
         loginButton.setOnClickListener(v -> {
             loginButton.setVisibility(View.INVISIBLE);
             loadingProgressBar.setVisibility(View.VISIBLE);
@@ -119,16 +108,16 @@ public class LoginFragment extends Fragment {
     }
 
     private void updateUiWithUser(LoggedInUserView model) {
-        String welcome = getString(R.string.welcome) + " " + model.getDisplayName();
-        if (getContext() != null && getContext().getApplicationContext() != null) {
+        final String welcome = this.getString(R.string.welcome) + " " + model.getDisplayName();
+        if (this.getContext() != null && this.getContext().getApplicationContext() != null) {
             Toast.makeText(getContext().getApplicationContext(), welcome, Toast.LENGTH_LONG).show();
         }
 
-        findNavController(this).navigate(R.id.action_login_to_profile);
-        BottomNavigationHelper.updateNav(getActivity());
+        FragmentKt.findNavController(this).navigate(R.id.action_login_to_profile);
+        BottomNavigationHelper.updateNav(requireActivity());
     }
 
-    private void showLoginFailed(String errorString) {
+    private void showLoginFailed(final String errorString) {
         if (this.getContext() != null && this.getContext().getApplicationContext() != null) {
             Toast.makeText(
                     this.getContext().getApplicationContext(),
