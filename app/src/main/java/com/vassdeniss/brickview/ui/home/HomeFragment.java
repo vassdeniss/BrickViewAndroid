@@ -29,14 +29,14 @@ public class HomeFragment extends Fragment implements SetAdapter.OnItemClickList
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
-        HomeViewModel homeViewModel = new ViewModelProvider(this, new HomeViewModelFactory())
+        final HomeViewModel homeViewModel = new ViewModelProvider(this, new HomeViewModelFactory())
                 .get(HomeViewModel.class);
 
         this.binding = FragmentHomeBinding.inflate(inflater, container, false);
 
-        RecyclerView view = this.binding.recyclerView;
-        List<SetData> data = new ArrayList<>();
-        SetAdapter adapter = new SetAdapter(getContext(), data, this);
+        final RecyclerView view = this.binding.recyclerView;
+        final List<SetData> data = new ArrayList<>();
+        final SetAdapter adapter = new SetAdapter(getContext(), data, this);
         view.setAdapter(adapter);
 
         homeViewModel.getAllSets(this.getContext());
@@ -60,10 +60,10 @@ public class HomeFragment extends Fragment implements SetAdapter.OnItemClickList
     }
 
     @Override
-    public void onItemClick(String id) {
-        NavController navController = FragmentKt.findNavController(this);
+    public void onItemClick(final String id) {
+        final NavController navController = FragmentKt.findNavController(this);
 
-        Bundle bundle = new Bundle();
+        final Bundle bundle = new Bundle();
         bundle.putString("_id", id);
 
         navController.navigate(R.id.action_home_to_review, bundle);

@@ -8,12 +8,13 @@ import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.vassdeniss.brickview.data.UserRepository;
 
 public class BottomNavigationHelper {
-    public static void updateNav(FragmentActivity activity) {
-        BottomNavigationView navView = activity.findViewById(R.id.nav_view);
-        MenuItem profile = navView.getMenu().findItem(R.id.navigation_profile);
-        MenuItem login = navView.getMenu().findItem(R.id.navigation_login);
-        MenuItem register = navView.getMenu().findItem(R.id.navigation_register);
-        boolean isLogged = UserRepository.getInstance().isLoggedIn();
+    public static void updateNav(final FragmentActivity activity) {
+        final BottomNavigationView navView = activity.findViewById(R.id.nav_view);
+        final MenuItem profile = navView.getMenu().findItem(R.id.navigation_profile);
+        final MenuItem login = navView.getMenu().findItem(R.id.navigation_login);
+        final MenuItem register = navView.getMenu().findItem(R.id.navigation_register);
+
+        final boolean isLogged = UserRepository.getInstance().isLoggedIn();
         if (isLogged) {
             profile.setVisible(true);
             login.setVisible(false);

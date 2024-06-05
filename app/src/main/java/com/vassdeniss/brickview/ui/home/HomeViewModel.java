@@ -21,17 +21,19 @@ public class HomeViewModel extends ViewModel {
         return this.data;
     }
 
-    public void getAllSets(Context context) {
-        VolleyRequestHelper.VolleyCallback<JSONArray> callbacks = new VolleyRequestHelper.VolleyCallback<JSONArray>() {
+    public void getAllSets(final Context context) {
+        final VolleyRequestHelper.VolleyCallback<JSONArray> callbacks = new VolleyRequestHelper.VolleyCallback<JSONArray>() {
             @Override
-            public void onSuccess(JSONArray result) {
-                Gson gson = new Gson();
-                SetData[] setData = gson.fromJson(result.toString(), SetData[].class);
+            public void onSuccess(final JSONArray result) {
+                final Gson gson = new Gson();
+                final SetData[] setData = gson.fromJson(result.toString(), SetData[].class);
                 data.setValue(setData);
             }
 
             @Override
-            public void onError(VolleyError error) { }
+            public void onError(final VolleyError error) {
+                VolleyRequestHelper.defaultErrorCallback(error);
+            }
         };
 
         new VolleyRequestHelper.Builder()
