@@ -48,12 +48,12 @@ public class AddReviewFragment extends Fragment {
         });
 
         this.addReviewViewModel.getResult().observe(this.getViewLifecycleOwner(), result -> {
-            if (result == null || result.isEmpty()) {
+            if (result == null) {
                 return;
             }
 
             this.binding.submitButton.setEnabled(true);
-            
+
             if (result.getError() != null) {
                 Toast.makeText(getContext().getApplicationContext(), result.getError(), Toast.LENGTH_SHORT).show();
             }
