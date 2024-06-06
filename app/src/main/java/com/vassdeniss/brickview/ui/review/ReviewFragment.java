@@ -1,14 +1,11 @@
 package com.vassdeniss.brickview.ui.review;
 
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
+import androidx.lifecycle.ViewModelProvider;
 
-import android.util.Base64;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -21,15 +18,12 @@ import com.vassdeniss.brickview.R;
 import com.vassdeniss.brickview.VolleyRequestHelper;
 import com.vassdeniss.brickview.data.model.SetDetails;
 import com.vassdeniss.brickview.databinding.FragmentReviewBinding;
+import com.vassdeniss.brickview.ui.profile.ProfileViewModelFactory;
 
 import org.json.JSONObject;
 
 public class ReviewFragment extends Fragment {
     private FragmentReviewBinding binding;
-
-    public ReviewFragment() {
-        // Required empty public constructor
-    }
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater,
@@ -37,38 +31,38 @@ public class ReviewFragment extends Fragment {
                              Bundle savedInstanceState) {
         this.binding = FragmentReviewBinding.inflate(inflater, container, false);
 
-        Bundle args = this.getArguments();
+        final ReviewViewModel reviewViewModel = new ViewModelProvider(this, new ProfileViewModelFactory())
+                .get(ReviewViewModel.class);
+
+        final Bundle args = this.getArguments();
         if (args != null) {
-            VolleyRequestHelper helper = VolleyRequestHelper.getInstance(this.getContext());
-
-            VolleyRequestHelper.VolleyCallback<JSONObject> callback = new VolleyRequestHelper.VolleyCallback<JSONObject>() {
-                @Override
-                public void onSuccess(JSONObject result) {
-                    Gson gson = new Gson();
-                    SetDetails details = gson.fromJson(result.toString(), SetDetails.class);
-                    binding.setReview.loadDataWithBaseURL(null, details.getContent(), "text/html", "UTF-8", null);
-
-                    Glide.with(getContext())
-                            .load(details.getSetImage())
-                            .into(binding.reviewSetImage);
-
-                    binding.reviewSetTitle.setText(details.getSetName());
-                    binding.reviewSetDetails.setText("Set Id: " + details.getSetNumber() + "\n" + "Parts: " + details.getSetParts()  + "\n" + "Year: " + details.getSetYear()  + "\n" + "Minifigs: " + details.getSetMinifigCount());
-                }
-
-                @Override
-                public void onError(VolleyError error) {
-                    helper.defaultErrorCallback(error);
-                }
-            };
-
-            new VolleyRequestHelper.Builder()
-                    .setContext(this.getContext())
-                    .useMethod(Request.Method.GET)
-                    .toUrl("/reviews/get/" + args.getString("_id"))
-                    .addCallback(callback)
-                    .execute();
+            reviewViewModel.getReview(requireContext(), args.getString("_id"));
         }
+
+        reviewViewModel.getResult().observe(this.getViewLifecycleOwner(), result -> {
+            if (result == null) {
+                return;
+            }
+
+            if (result.getSuccess() != null) {
+                SetDetails details = result.getSuccess();
+
+                this.binding.setReview.loadDataWithBaseURL(null, details.getContent(), "text/html", "UTF-8", null);
+
+                Glide.with(requireContext())
+                        .load(details.getSetImage())
+                        .into(this.binding.reviewSetImage);
+
+                this.binding.reviewSetTitle.setText(details.getSetName());
+
+                final String text = String.format(this.getString(R.string.review_set_details),
+                        details.getSetNumber(),
+                        details.getSetParts(),
+                        details.getSetYear(),
+                        details.getSetMinifigCount());
+                this.binding.reviewSetDetails.setText(text);
+            }
+        });
 
         return this.binding.getRoot();
     }

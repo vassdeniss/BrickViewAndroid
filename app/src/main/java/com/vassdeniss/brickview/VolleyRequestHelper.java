@@ -27,13 +27,11 @@ import java.util.Objects;
 public class VolleyRequestHelper {
     private static VolleyRequestHelper instance;
     private RequestQueue requestQueue;
-    private static Context ctx;
     private final String baseUrl;
 
     private VolleyRequestHelper(Context context) {
-        ctx = context;
         this.baseUrl = "https://brickview.api.vasspass.net";
-        this.requestQueue = this.getRequestQueue();
+        this.requestQueue = this.getRequestQueue(context);
     }
 
     public static synchronized VolleyRequestHelper getInstance(Context context) {
@@ -44,9 +42,9 @@ public class VolleyRequestHelper {
         return instance;
     }
 
-    public RequestQueue getRequestQueue() {
+    public RequestQueue getRequestQueue(Context context) {
         if (this.requestQueue == null) {
-            this.requestQueue = Volley.newRequestQueue(ctx.getApplicationContext());
+            this.requestQueue = Volley.newRequestQueue(context.getApplicationContext());
         }
 
         return this.requestQueue;
@@ -92,6 +90,7 @@ public class VolleyRequestHelper {
     }
 
     private void makeRequest(
+            Context context,
             int method,
             String url,
             @Nullable Map<String, String> headers,
@@ -106,10 +105,11 @@ public class VolleyRequestHelper {
             }
         };
 
-        this.getRequestQueue().add(jsonObjectRequest);
+        this.getRequestQueue(context).add(jsonObjectRequest);
     }
 
     private void makeArrayRequest(
+            Context context,
             int method,
             String url,
             @Nullable Map<String, String> headers,
@@ -123,7 +123,7 @@ public class VolleyRequestHelper {
             }
         };
 
-        this.getRequestQueue().add(jsonArrayRequest);
+        this.getRequestQueue(context).add(jsonArrayRequest);
     }
 
     public interface VolleyCallback<T> {
@@ -179,9 +179,9 @@ public class VolleyRequestHelper {
             VolleyRequestHelper helper = VolleyRequestHelper.getInstance(this.ctx);
 
             if (this.arrayCallback == null) {
-                helper.makeRequest(this.method, this.url, this.headers, this.body, this.callback);
+                helper.makeRequest(this.ctx, this.method, this.url, this.headers, this.body, this.callback);
             } else {
-                helper.makeArrayRequest(this.method, this.url, this.headers, this.arrayCallback);
+                helper.makeArrayRequest(this.ctx, this.method, this.url, this.headers, this.arrayCallback);
             }
         }
     }

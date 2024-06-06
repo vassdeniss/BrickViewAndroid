@@ -29,4 +29,5 @@
     <string name="profile_greeting">Hello %1$s</string>
     <string name="home_review_info">Review by %1$s\n%2$s</string>
     <string name="profile_set_info">Year: %1$d\nParts: %2$d</string>
+    <string name="review_set_details">Set Id: %1$s\nParts: %2$d\nYear: %3$d\nMinifigs: %4$d</string>
 </resources>
