@@ -1,4 +1,4 @@
-package com.vassdeniss.brickview.data.model;
+package com.vassdeniss.brickview.data.adapter;
 
 import android.content.Context;
 import android.view.LayoutInflater;
@@ -13,6 +13,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
 import com.vassdeniss.brickview.R;
+import com.vassdeniss.brickview.data.model.Set;
 
 import java.util.List;
 

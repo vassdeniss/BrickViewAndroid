@@ -38,11 +38,11 @@ public class RegisterViewModel extends ViewModel {
                          final String password,
                          final String repeatPassword,
                          final Context context) {
-        VolleyRequestHelper.VolleyCallback<JSONObject> callbacks = new VolleyRequestHelper.VolleyCallback<JSONObject>() {
+        final VolleyRequestHelper.VolleyCallback<JSONObject> callbacks = new VolleyRequestHelper.VolleyCallback<JSONObject>() {
             @Override
             public void onSuccess(JSONObject jsonResult) {
-                Gson gson = new Gson();
-                Response res = gson.fromJson(jsonResult.toString(), Response.class);
+                final Gson gson = new Gson();
+                final Response res = gson.fromJson(jsonResult.toString(), Response.class);
                 res.user.setImage(res.image);
                 res.user.setTokens(res.tokens);
                 userRepository.setLoggedInUser(res.user);

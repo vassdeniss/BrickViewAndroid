@@ -127,7 +127,7 @@ public class RegisterFragment extends Fragment {
     }
 
     private void updateUiWithUser(LoggedInUserView model) {
-        String welcome = getString(R.string.welcome) + " " + model.getDisplayName();
+        final String welcome = getString(R.string.welcome) + " " + model.getDisplayName();
         if (getContext() != null && getContext().getApplicationContext() != null) {
             Toast.makeText(getContext().getApplicationContext(), welcome, Toast.LENGTH_LONG).show();
         }

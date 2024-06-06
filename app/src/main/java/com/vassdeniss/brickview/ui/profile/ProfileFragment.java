@@ -15,6 +15,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
+import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -25,35 +26,19 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Toast;
 
-import com.android.volley.Request;
-import com.android.volley.VolleyError;
-import com.google.gson.Gson;
 import com.vassdeniss.brickview.BottomNavigationHelper;
 import com.vassdeniss.brickview.R;
-import com.vassdeniss.brickview.VolleyRequestHelper;
 import com.vassdeniss.brickview.data.UserRepository;
-import com.vassdeniss.brickview.data.model.ProfileSetAdapter;
-import com.vassdeniss.brickview.data.model.ProfileSetData;
+import com.vassdeniss.brickview.data.adapter.ProfileSetAdapter;
 import com.vassdeniss.brickview.data.model.Set;
 import com.vassdeniss.brickview.data.model.User;
 import com.vassdeniss.brickview.databinding.FragmentProfileBinding;
 
-import org.json.JSONException;
-import org.json.JSONObject;
-
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 
 public class ProfileFragment extends Fragment {
     private FragmentProfileBinding binding;
-    private final UserRepository userRepository;
-    private final VolleyRequestHelper helper;
-
-    public ProfileFragment() {
-        this.userRepository = UserRepository.getInstance();
-        this.helper = VolleyRequestHelper.getInstance(this.getContext());
-    }
+    private ProfileViewModel profileViewModel;
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater,
@@ -67,135 +52,81 @@ public class ProfileFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
+        profileViewModel = new ViewModelProvider(this, new ProfileViewModelFactory())
+                .get(ProfileViewModel.class);
+
         final UserRepository repo = UserRepository.getInstance();
         final User user = repo.getLoggedInUser();
+
         final String image = user.getImage();
-
-        final String pureBase64Encoded = image.substring(image.indexOf(",")  + 1);
-        final byte[] decodedBytes = Base64.decode(pureBase64Encoded, Base64.DEFAULT);
-        final Bitmap bitmap = BitmapFactory.decodeByteArray(decodedBytes, 0, decodedBytes.length);
-        this.binding.avatarImageView.setImageBitmap(bitmap);
-
-        final String username = repo.getLoggedInUser().getUsername();
-        this.binding.usernameTextview.setText("Hello " + username);
-
-        RecyclerView rView = this.binding.recyclerView;
-        rView.setLayoutManager(new LinearLayoutManager(getContext()));
-        List<ProfileSetData> data = new ArrayList<>();
-
-        for (Set set : repo.getLoggedInUser().getSets()) {
-            data.add(new ProfileSetData(set));
+        if (image != null) {
+            final String pureBase64Encoded = image.substring(image.indexOf(",")  + 1);
+            final byte[] decodedBytes = Base64.decode(pureBase64Encoded, Base64.DEFAULT);
+            final Bitmap bitmap = BitmapFactory.decodeByteArray(decodedBytes, 0, decodedBytes.length);
+            this.binding.avatarImageView.setImageBitmap(bitmap);
         }
 
-        ProfileSetAdapter adapter = new ProfileSetAdapter(getContext(), data);
+        final String username = repo.getLoggedInUser().getUsername();
+        this.binding.usernameTextview.setText(String.format(this.getString(R.string.profile_greeting), username));
+
+        final RecyclerView rView = this.binding.recyclerView;
+        rView.setLayoutManager(new LinearLayoutManager(requireContext()));
+        List<Set> data = repo.getLoggedInUser().getSets();
+
+        final ProfileSetAdapter adapter = new ProfileSetAdapter(requireContext(), data);
         rView.setAdapter(adapter);
 
-        ItemTouchHelper itemTouchHelper = new ItemTouchHelper(createItemTouchCallback(data, adapter));
+        final ItemTouchHelper itemTouchHelper = new ItemTouchHelper(this.createItemTouchCallback(this, data, adapter));
         itemTouchHelper.attachToRecyclerView(rView);
 
-        this.binding.logoutButton.setOnClickListener(v -> this.logout());
-        this.binding.addSetButton.setOnClickListener(v -> this.addSet(data, adapter));
-    }
+        profileViewModel.getResult().observe(this.getViewLifecycleOwner(), result -> {
+            if (result == null) {
+                return;
+            }
 
-    private void logout() {
-        userRepository.logout();
-        findNavController(this).navigate(R.id.action_profile_to_home);
-        BottomNavigationHelper.updateNav(getActivity());
-    }
+            this.binding.loading.setVisibility(View.GONE);
+            this.binding.addSetButton.setEnabled(true);
 
-    private void addSet(List<ProfileSetData> data, ProfileSetAdapter adapter) {
-        this.binding.addSetButton.setEnabled(false);
-        this.binding.loading.setVisibility(View.VISIBLE);
-        String setId = this.binding.setNumberTextView.getText().toString();
-        this.binding.setNumberTextView.setText("");
+            if (result.getError() != null) {
+                Toast.makeText(getContext(), result.getError(), Toast.LENGTH_LONG).show();
+            }
 
-        VolleyRequestHelper.VolleyCallback<JSONObject> callbacks = new VolleyRequestHelper.VolleyCallback<JSONObject>() {
-            @Override
-            public void onSuccess(JSONObject result) {
-                Gson gson = new Gson();
-                User user = null;
-                try {
-                    user = gson.fromJson(result.get("user").toString(), User.class);
-                } catch (JSONException ignored) { }
-
-                userRepository.updateUser(user);
-                updateUi();
+            if (result.getSuccess() != null) {
                 data.clear();
-                for (Set set : userRepository.getLoggedInUser().getSets()) {
-                    data.add(new ProfileSetData(set));
-                }
+                data.addAll(result.getSuccess());
                 adapter.notifyDataSetChanged();
             }
+        });
 
-            @Override
-            public void onError(VolleyError error) {
-                String message = helper.defaultErrorCallback(error);
-                if (!Objects.equals(message, "")) {
-                    Toast.makeText(getContext(), message, Toast.LENGTH_LONG).show();
-                }
-                updateUi();
-            }
+        this.binding.logoutButton.setOnClickListener(v -> {
+            profileViewModel.logout();
+            findNavController(this).navigate(R.id.action_profile_to_home);
+            BottomNavigationHelper.updateNav(requireActivity());
+        });
+        this.binding.addSetButton.setOnClickListener(v -> {
+            this.binding.addSetButton.setEnabled(false);
+            this.binding.loading.setVisibility(View.VISIBLE);
 
-            private void updateUi() {
-                binding.loading.setVisibility(View.GONE);
-                binding.addSetButton.setEnabled(true);
-            }
-        };
-
-        new VolleyRequestHelper.Builder()
-                .setContext(this.getContext())
-                .useMethod(Request.Method.POST)
-                .toUrl("/sets/add-set")
-                .withHeaders(helper.makeTokenHeaders(userRepository.getLoggedInUser().getTokens()))
-                .withBody(helper.createBody("setId", setId))
-                .addCallback(callbacks)
-                .execute();
+            final String setId = this.binding.setNumberTextView.getText().toString();
+            this.binding.setNumberTextView.setText("");
+            profileViewModel.addSet(requireContext(), setId);
+        });
     }
 
-    private void deleteSet(ProfileSetData set, ProfileSetAdapter adapter, int pos) {
-        this.binding.addSetButton.setEnabled(false);
-        this.binding.loading.setVisibility(View.VISIBLE);
-        VolleyRequestHelper.VolleyCallback<JSONObject> callbacks = new VolleyRequestHelper.VolleyCallback<JSONObject>() {
+    private ItemTouchHelper.SimpleCallback createItemTouchCallback(final ProfileFragment frag, final List<Set> data, final ProfileSetAdapter adapter) {
+        return new ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.LEFT | ItemTouchHelper.RIGHT) {
             @Override
-            public void onSuccess(JSONObject result) {
-                Gson gson = new Gson();
-                User user = null;
-                try {
-                    user = gson.fromJson(result.get("user").toString(), User.class);
-                } catch (JSONException ignored) { }
+            public int getSwipeDirs(@NonNull RecyclerView recyclerView, @NonNull RecyclerView.ViewHolder viewHolder) {
+                final int pos = viewHolder.getAdapterPosition();
+                final Set set = data.get(pos);
 
-                userRepository.updateUser(user);
-                adapter.removeItem(pos);
-                updateUi();
-            }
-
-            @Override
-            public void onError(VolleyError error) {
-                String message = helper.defaultErrorCallback(error);
-                if (!Objects.equals(message, "")) {
-                    Toast.makeText(getContext(), message, Toast.LENGTH_LONG).show();
+                if (set.getReview() == null || set.getReview().isEmpty()) {
+                    return ItemTouchHelper.LEFT | ItemTouchHelper.RIGHT;
+                } else {
+                    return ItemTouchHelper.LEFT;
                 }
-                adapter.notifyItemChanged(pos);
-                updateUi();
             }
 
-            private void updateUi() {
-                binding.loading.setVisibility(View.GONE);
-                binding.addSetButton.setEnabled(true);
-            }
-        };
-
-        new VolleyRequestHelper.Builder()
-                .setContext(getContext())
-                .useMethod(Request.Method.DELETE)
-                .toUrl("/sets/delete/" + set.getSetId())
-                .withHeaders(helper.makeTokenHeaders(userRepository.getLoggedInUser().getTokens()))
-                .addCallback(callbacks)
-                .execute();
-    }
-
-    private ItemTouchHelper.SimpleCallback createItemTouchCallback(List<ProfileSetData> data, ProfileSetAdapter adapter) {
-        return new ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.LEFT) {
             @Override
             public boolean onMove(@NonNull RecyclerView recyclerView, @NonNull RecyclerView.ViewHolder viewHolder, @NonNull RecyclerView.ViewHolder target) {
                 return false;
@@ -203,39 +134,67 @@ public class ProfileFragment extends Fragment {
 
             @Override
             public void onSwiped(@NonNull RecyclerView.ViewHolder viewHolder, int direction) {
-                int pos = viewHolder.getAdapterPosition();
-                ProfileSetData set = data.get(pos);
-                new AlertDialog.Builder(getContext())
-                        .setTitle("Confirm Delete")
-                        .setMessage("Are you sure you want to delete this set?")
-                        .setPositiveButton("Delete", (dialog, which) -> deleteSet(set, adapter, pos))
-                        .setNegativeButton("Cancel", (dialog, which) -> adapter.notifyItemChanged(viewHolder.getAdapterPosition()))
-                        .show();
+                final int pos = viewHolder.getAdapterPosition();
+                final Set set = data.get(pos);
+
+                if (direction == ItemTouchHelper.LEFT) {
+                    new AlertDialog.Builder(requireContext())
+                            .setTitle("Confirm Delete")
+                            .setMessage("Are you sure you want to delete this set?")
+                            .setPositiveButton("Delete", (dialog, which) -> {
+                                binding.addSetButton.setEnabled(false);
+                                binding.loading.setVisibility(View.VISIBLE);
+                                profileViewModel.deleteSet(requireContext(), set);
+                            })
+                            .setNegativeButton("Cancel", (dialog, which) -> adapter.notifyItemChanged(pos))
+                            .show();
+                } else if (direction == ItemTouchHelper.RIGHT) {
+                    final Bundle bundle = new Bundle();
+                    bundle.putString("_id", set.getSetId());
+                    findNavController(frag).navigate(R.id.action_profile_to_add, bundle);
+                }
             }
 
             @Override
             public void onChildDraw(@NonNull Canvas c, @NonNull RecyclerView recyclerView, @NonNull RecyclerView.ViewHolder viewHolder, float dX, float dY, int actionState, boolean isCurrentlyActive) {
                 super.onChildDraw(c, recyclerView, viewHolder, dX, dY, actionState, isCurrentlyActive);
 
-                int backgroundCornerOffset = 20;
-                View itemView = viewHolder.itemView;
-                Drawable icon = ContextCompat.getDrawable(getContext().getApplicationContext(), R.drawable.trash_can);
-                ColorDrawable background = new ColorDrawable(Color.RED);
+                final int backgroundCornerOffset = 20;
+                final View itemView = viewHolder.itemView;
 
-                int iconSize = icon.getIntrinsicHeight() / 2;
-                int iconMargin = (itemView.getHeight() - iconSize) / 2;
+                Drawable icon;
+                ColorDrawable background;
+                if (dX > 0) {
+                    icon = ContextCompat.getDrawable(getContext().getApplicationContext(), R.drawable.plus);
+                    background = new ColorDrawable(Color.rgb(0, 100, 0));
+                } else {
+                    icon = ContextCompat.getDrawable(getContext().getApplicationContext(), R.drawable.trash_can);
+                    background = new ColorDrawable(Color.RED);
+                }
+
+                final int iconSize = icon.getIntrinsicHeight() / 2;
+                final int iconMargin = (itemView.getHeight() - iconSize) / 2;
                 int iconTop = itemView.getTop() + (itemView.getHeight() - iconSize) / 2;
                 int iconBottom = iconTop + iconSize;
                 icon.setTint(Color.WHITE);
 
-                if (dX < 0) {
-                    int iconLeft = itemView.getRight() - iconMargin - iconSize;
-                    int iconRight = iconLeft + iconSize;
+                if (dX > 0) {
+                    iconTop = itemView.getTop() + (itemView.getHeight() - icon.getIntrinsicHeight()) / 2;
+                    iconBottom = iconTop + icon.getIntrinsicHeight();
+
+                    final int iconLeft = itemView.getLeft() + (itemView.getHeight() - icon.getIntrinsicHeight()) / 2;
+                    final int iconRight = iconLeft + icon.getIntrinsicHeight();
+                    icon.setBounds(iconLeft, iconTop, iconRight, iconBottom);
+
+                    background.setBounds(itemView.getLeft(), itemView.getTop(),
+                            itemView.getLeft() + ((int) dX) + backgroundCornerOffset, itemView.getBottom());
+                } else if (dX < 0) {
+                    final int iconLeft = itemView.getRight() - iconMargin - iconSize;
+                    final int iconRight = iconLeft + iconSize;
                     icon.setBounds(iconLeft, iconTop, iconRight, iconBottom);
 
                     background.setBounds(itemView.getRight() + ((int) dX) - backgroundCornerOffset,
                             itemView.getTop(), itemView.getRight(), itemView.getBottom());
-
                 } else {
                     background.setBounds(0, 0, 0, 0);
                 }
