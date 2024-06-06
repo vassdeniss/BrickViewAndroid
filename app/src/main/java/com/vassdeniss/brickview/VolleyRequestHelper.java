@@ -28,7 +28,7 @@ public class VolleyRequestHelper {
     private static VolleyRequestHelper instance;
     private RequestQueue requestQueue;
     private static Context ctx;
-    private String baseUrl;
+    private final String baseUrl;
 
     private VolleyRequestHelper(Context context) {
         ctx = context;
@@ -52,14 +52,14 @@ public class VolleyRequestHelper {
         return this.requestQueue;
     }
 
-    public Map<String, String> makeTokenHeaders(Tokens tokens) {
+    public static Map<String, String> makeTokenHeaders(Tokens tokens) {
         Map<String, String> headers = new HashMap<>();
         headers.put("X-Authorization", tokens.getAccessToken());
         headers.put("X-Refresh", tokens.getRefreshToken());
         return headers;
     }
 
-    public String defaultErrorCallback(VolleyError error) {
+    public static String defaultErrorCallback(VolleyError error) {
         if (error.networkResponse != null && error.networkResponse.data != null) {
             try {
                 String errorMessage = new String(error.networkResponse.data);
@@ -73,7 +73,7 @@ public class VolleyRequestHelper {
         return "";
     }
 
-    public JSONObject createBody(String... params) {
+    public static JSONObject createBody(String... params) {
         if (params.length % 2 != 0) {
             throw new IllegalArgumentException("Invalid number of arguments passed. Must be even to form key-value pairs.");
         }

@@ -10,14 +10,14 @@ import com.android.volley.Request;
 import com.android.volley.VolleyError;
 import com.google.gson.Gson;
 import com.vassdeniss.brickview.VolleyRequestHelper;
-import com.vassdeniss.brickview.data.model.SetData;
+import com.vassdeniss.brickview.data.model.Set;
 
 import org.json.JSONArray;
 
 public class HomeViewModel extends ViewModel {
-    private final MutableLiveData<SetData[]> data = new MutableLiveData<>();
+    private final MutableLiveData<Set[]> data = new MutableLiveData<>();
 
-    public LiveData<SetData[]> getData() {
+    public LiveData<Set[]> getData() {
         return this.data;
     }
 
@@ -26,7 +26,7 @@ public class HomeViewModel extends ViewModel {
             @Override
             public void onSuccess(final JSONArray result) {
                 final Gson gson = new Gson();
-                final SetData[] setData = gson.fromJson(result.toString(), SetData[].class);
+                final Set[] setData = gson.fromJson(result.toString(), Set[].class);
                 data.setValue(setData);
             }
 

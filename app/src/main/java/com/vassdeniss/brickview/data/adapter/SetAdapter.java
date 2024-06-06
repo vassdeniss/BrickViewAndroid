@@ -1,4 +1,4 @@
-package com.vassdeniss.brickview.data.model;
+package com.vassdeniss.brickview.data.adapter;
 
 import android.content.Context;
 import android.graphics.Bitmap;
@@ -10,22 +10,24 @@ import android.view.ViewGroup;
 import android.widget.GridLayout;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
 import com.vassdeniss.brickview.R;
+import com.vassdeniss.brickview.data.model.Set;
 
 import java.util.List;
 
 public class SetAdapter extends RecyclerView.Adapter<SetAdapter.ViewHolder> {
-    private final List<SetData> data;
+    private final List<Set> data;
     private final Context context;
     private final OnItemClickListener listener;
 
-    public SetAdapter(Context context, List<SetData> data, OnItemClickListener listener) {
+    public SetAdapter(final Context context,
+                      final List<Set> data,
+                      final OnItemClickListener listener) {
         this.context = context;
         this.data = data;
         this.listener = listener;
@@ -34,36 +36,40 @@ public class SetAdapter extends RecyclerView.Adapter<SetAdapter.ViewHolder> {
     @NonNull
     @Override
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.set, parent, false);
+        final View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.set, parent, false);
         return new ViewHolder(view);
     }
 
     @Override
     public void onBindViewHolder(@NonNull SetAdapter.ViewHolder holder, int position) {
-        SetData data = this.data.get(position);
+        final Set set = this.data.get(position);
 
         Glide.with(this.context)
-                .load(data.getImageUrl())
+                .load(set.getImage())
                 .into(holder.setImage);
 
-        String text = data.getName();
+        String text = set.getName();
         if (text.length() > 24) {
             text = text.substring(0, 23) + "...";
         }
 
         holder.title.setText(text);
-        holder.info.setText("Review by " + data.getUsername() + "\n" + data.getDate());
+
+        final String info = String.format(this.context.getString(R.string.home_review_info), set.getUsername(), set.getDate());
+        holder.info.setText(info);
         holder.grid.setOnClickListener(view -> {
             if (this.listener != null) {
-                this.listener.onItemClick(data.getId());
+                this.listener.onItemClick(set.getId());
             }
         });
 
-        final String image = data.getUserImage();
-        final String pureBase64Encoded = image.substring(image.indexOf(",")  + 1);
-        final byte[] decodedBytes = Base64.decode(pureBase64Encoded, Base64.DEFAULT);
-        final Bitmap bitmap = BitmapFactory.decodeByteArray(decodedBytes, 0, decodedBytes.length);
-        holder.authorImage.setImageBitmap(bitmap);
+        final String image = set.getUserImage();
+        if (image != null) {
+            final String pureBase64Encoded = image.substring(image.indexOf(",")  + 1);
+            final byte[] decodedBytes = Base64.decode(pureBase64Encoded, Base64.DEFAULT);
+            final Bitmap bitmap = BitmapFactory.decodeByteArray(decodedBytes, 0, decodedBytes.length);
+            holder.authorImage.setImageBitmap(bitmap);
+        }
     }
 
     @Override
@@ -72,13 +78,13 @@ public class SetAdapter extends RecyclerView.Adapter<SetAdapter.ViewHolder> {
     }
 
     public static class ViewHolder extends RecyclerView.ViewHolder {
-        public ImageView setImage;
-        public TextView title;
-        public TextView info;
-        public GridLayout grid;
-        public ImageView authorImage;
+        public final ImageView setImage;
+        public final TextView title;
+        public final TextView info;
+        public final GridLayout grid;
+        public final ImageView authorImage;
 
-        public ViewHolder(View itemView) {
+        public ViewHolder(final View itemView) {
             super(itemView);
 
             this.setImage = itemView.findViewById(R.id.set_image);

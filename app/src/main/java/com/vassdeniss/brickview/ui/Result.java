@@ -2,9 +2,9 @@ package com.vassdeniss.brickview.ui;
 
 import androidx.annotation.Nullable;
 
-public class Result {
+public class Result<T> {
     @Nullable
-    private LoggedInUserView success;
+    private T success;
     @Nullable
     private String error;
 
@@ -12,12 +12,12 @@ public class Result {
         this.error = error;
     }
 
-    public Result(@Nullable LoggedInUserView success) {
+    public Result(@Nullable T success) {
         this.success = success;
     }
 
     @Nullable
-    public LoggedInUserView getSuccess() {
+    public T getSuccess() {
         return this.success;
     }
 

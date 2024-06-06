@@ -26,4 +26,7 @@
     <string name="action_sign_in">Sign in or register</string>
     <string name="title_register">Register</string>
     <string name="title_profile">Profile</string>
+    <string name="profile_greeting">Hello %1$s</string>
+    <string name="home_review_info">Review by %1$s\n%2$s</string>
+    <string name="profile_set_info">Year: %1$d\nParts: %2$d</string>
 </resources>

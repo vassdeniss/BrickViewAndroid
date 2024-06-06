@@ -9,11 +9,18 @@ public class Set {
     private String image;
     private int minifigCount;
     private Minifigure[] minifigs;
-    private String user;
+    private String username;
+    private String userImage;
     private String[] videoIds;
+    private String review;
+    private String reviewDate;
+
+    public String getId() {
+        return this._id;
+    }
 
     public String getUsername() {
-        return this.user;
+        return this.username;
     }
 
     public String getName() {
@@ -36,17 +43,15 @@ public class Set {
         return this.parts;
     }
 
-    public String getU() {
-        return this.name;
+    public String getUserImage() {
+        return this.userImage;
     }
 
-//    public String getName() {
-//        return this.name;
-//    }
-//
-//            this.username = username;
-//        this.name = name;
-//        this.image = image;
-//        this.userImage = userImage;
-//        this.reviewDate = reviewData;
+    public String getReview() {
+        return this.review;
+    }
+
+    public String getDate() {
+        return this.reviewDate;
+    }
 }

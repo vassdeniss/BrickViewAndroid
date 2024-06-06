@@ -13,7 +13,7 @@ public class RegisterFormState {
     private final Integer repeatPasswordError;
     private final boolean isDataValid;
 
-    RegisterFormState(
+    public RegisterFormState(
             @Nullable Integer usernameError,
             @Nullable Integer emailError,
             @Nullable Integer passwordError,
@@ -25,7 +25,7 @@ public class RegisterFormState {
         this.isDataValid = false;
     }
 
-    RegisterFormState(boolean isDataValid) {
+    public RegisterFormState(boolean isDataValid) {
         this.usernameError = null;
         this.emailError = null;
         this.passwordError = null;
@@ -34,22 +34,22 @@ public class RegisterFormState {
     }
 
     @Nullable
-    Integer getUsernameError() {
+    public Integer getUsernameError() {
         return this.usernameError;
     }
 
     @Nullable
-    Integer getEmailError() {
+    public Integer getEmailError() {
         return this.emailError;
     }
 
     @Nullable
-    Integer getPasswordError() {
+    public Integer getPasswordError() {
         return this.passwordError;
     }
 
     @Nullable
-    Integer getRepeatPasswordError() {
+    public Integer getRepeatPasswordError() {
         return this.repeatPasswordError;
     }
 

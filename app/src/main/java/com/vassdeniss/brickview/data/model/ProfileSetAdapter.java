@@ -1,16 +1,12 @@
 package com.vassdeniss.brickview.data.model;
 
 import android.content.Context;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.util.Base64;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.GridLayout;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
@@ -21,10 +17,10 @@ import com.vassdeniss.brickview.R;
 import java.util.List;
 
 public class ProfileSetAdapter extends RecyclerView.Adapter<ProfileSetAdapter.ViewHolder> {
-    private List<ProfileSetData> data;
-    private Context context;
+    private final List<Set> data;
+    private final Context context;
 
-    public ProfileSetAdapter(Context context, List<ProfileSetData> data) {
+    public ProfileSetAdapter(final Context context, final List<Set> data) {
         this.context = context;
         this.data = data;
     }
@@ -32,26 +28,27 @@ public class ProfileSetAdapter extends RecyclerView.Adapter<ProfileSetAdapter.Vi
     @NonNull
     @Override
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.profile_set, parent, false);
+        final View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.profile_set, parent, false);
         return new ViewHolder(view);
     }
 
     @Override
     public void onBindViewHolder(@NonNull ProfileSetAdapter.ViewHolder holder, int position) {
-        ProfileSetData data = this.data.get(position);
+        final Set set = this.data.get(position);
 
         Glide.with(this.context)
-                .load(data.getImageUrl())
+                .load(set.getImage())
                 .into(holder.setImage);
 
-        String text = data.getName();
+        String text = set.getName();
         if (text.length() > 24) {
             text = text.substring(0, 23) + "...";
         }
 
         holder.title.setText(text);
-        holder.info.setText("Year: " + data.getYear() + "\n" + "Parts: " + data.getParts());
-        holder.grid.setOnClickListener(view -> Toast.makeText(view.getContext(), "click on item: " + data.getName(),Toast.LENGTH_LONG).show());
+
+        final String info = String.format(this.context.getString(R.string.profile_set_info), set.getYear(), set.getParts());
+        holder.info.setText(info);
     }
 
     @Override
@@ -59,16 +56,16 @@ public class ProfileSetAdapter extends RecyclerView.Adapter<ProfileSetAdapter.Vi
         return this.data.size();
     }
 
-    public void removeItem(int position) {
+    public void removeItem(final int position) {
         this.data.remove(position);
         this.notifyItemRemoved(position);
     }
 
     public static class ViewHolder extends RecyclerView.ViewHolder {
-        public ImageView setImage;
-        public TextView title;
-        public TextView info;
-        public GridLayout grid;
+        public final ImageView setImage;
+        public final TextView title;
+        public final TextView info;
+        public final GridLayout grid;
 
         public ViewHolder(View itemView) {
             super(itemView);

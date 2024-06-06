@@ -1,8 +1,8 @@
 package com.vassdeniss.brickview.data.model;
 
 public class Tokens {
-    private String accessToken;
-    private String refreshToken;
+    private final String accessToken;
+    private final String refreshToken;
 
     public Tokens(String accessToken, String refreshToken) {
         this.accessToken = accessToken;

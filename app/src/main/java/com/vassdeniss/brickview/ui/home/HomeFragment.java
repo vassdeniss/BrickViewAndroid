@@ -14,8 +14,8 @@ import androidx.navigation.fragment.FragmentKt;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.vassdeniss.brickview.R;
-import com.vassdeniss.brickview.data.model.SetAdapter;
-import com.vassdeniss.brickview.data.model.SetData;
+import com.vassdeniss.brickview.data.model.Set;
+import com.vassdeniss.brickview.data.adapter.SetAdapter;
 import com.vassdeniss.brickview.databinding.FragmentHomeBinding;
 
 import java.util.ArrayList;
@@ -35,7 +35,7 @@ public class HomeFragment extends Fragment implements SetAdapter.OnItemClickList
         this.binding = FragmentHomeBinding.inflate(inflater, container, false);
 
         final RecyclerView view = this.binding.recyclerView;
-        final List<SetData> data = new ArrayList<>();
+        final List<Set> data = new ArrayList<>();
         final SetAdapter adapter = new SetAdapter(getContext(), data, this);
         view.setAdapter(adapter);
 

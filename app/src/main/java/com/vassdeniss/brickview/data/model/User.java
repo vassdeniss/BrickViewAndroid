@@ -1,11 +1,13 @@
 package com.vassdeniss.brickview.data.model;
 
+import java.util.List;
+
 public class User {
     private String _id;
     private String username;
     private String email;
     private String image;
-    private Set[] sets;
+    private List<Set> sets;
     private Tokens tokens;
 
     public String getId() {
@@ -28,7 +30,7 @@ public class User {
         return this.email;
     }
 
-    public void setEmail(String email) {
+    public void setEmail(final String email) {
         this.email = email;
     }
 
@@ -40,19 +42,19 @@ public class User {
         return this.tokens;
     }
 
-    public Set[] getSets() {
+    public List<Set> getSets() {
         return this.sets;
     }
 
-    public void setSets(Set[] sets) {
+    public void setSets(final List<Set> sets) {
         this.sets = sets;
     }
 
-    public void setTokens(Tokens tokens) {
+    public void setTokens(final Tokens tokens) {
         this.tokens = tokens;
     }
 
-    public void setImage(String image) {
+    public void setImage(final String image) {
         this.image = image;
     }
 }

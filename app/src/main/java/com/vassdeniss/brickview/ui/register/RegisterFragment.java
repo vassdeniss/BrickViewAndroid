@@ -8,7 +8,9 @@ import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -45,11 +47,15 @@ public class RegisterFragment extends Fragment {
         final EditText emailEditText = this.binding.email;
         final EditText passwordEditText = this.binding.password;
         final EditText repeatPasswordEditText = this.binding.repeatPassword;
+        final Button registerButton = this.binding.register;
+        final ProgressBar loadingProgressBar = this.binding.loading;
 
         this.registerViewModel.getRegisterFormState().observe(this.getViewLifecycleOwner(), registerFormState -> {
             if (registerFormState == null) {
                 return;
             }
+
+            registerButton.setEnabled(registerFormState.isDataValid());
 
             if (registerFormState.getUsernameError() != null) {
                 usernameEditText.setError(this.getString(registerFormState.getUsernameError()));
@@ -68,11 +74,13 @@ public class RegisterFragment extends Fragment {
             }
         });
 
-        this.registerViewModel.getRegisterResult().observe(getViewLifecycleOwner(), registerResult -> {
+        this.registerViewModel.getResult().observe(getViewLifecycleOwner(), registerResult -> {
             if (registerResult == null) {
                 return;
             }
 
+            registerButton.setVisibility(View.VISIBLE);
+            loadingProgressBar.setVisibility(View.GONE);
             if (registerResult.getError() != null) {
                 this.showRegisterFailed(registerResult.getError());
             }
@@ -107,6 +115,15 @@ public class RegisterFragment extends Fragment {
         emailEditText.addTextChangedListener(afterTextChangedListener);
         passwordEditText.addTextChangedListener(afterTextChangedListener);
         repeatPasswordEditText.addTextChangedListener(afterTextChangedListener);
+        registerButton.setOnClickListener(v -> {
+            registerButton.setVisibility(View.INVISIBLE);
+            loadingProgressBar.setVisibility(View.VISIBLE);
+            registerViewModel.register(usernameEditText.getText().toString(),
+                    emailEditText.getText().toString(),
+                    passwordEditText.getText().toString(),
+                    repeatPasswordEditText.getText().toString(),
+                    requireContext());
+        });
     }
 
     private void updateUiWithUser(LoggedInUserView model) {
@@ -116,7 +133,7 @@ public class RegisterFragment extends Fragment {
         }
 
         findNavController(this).navigate(R.id.action_register_to_profile);
-        BottomNavigationHelper.updateNav(getActivity());
+        BottomNavigationHelper.updateNav(requireActivity());
     }
 
     private void showRegisterFailed(String errorString) {

@@ -22,14 +22,14 @@ import java.util.Objects;
 
 public class LoginViewModel extends ViewModel {
     private final MutableLiveData<LoginFormState> loginFormState = new MutableLiveData<>();
-    private final MutableLiveData<Result> result = new MutableLiveData<>();
+    private final MutableLiveData<Result<LoggedInUserView>> result = new MutableLiveData<>();
     private final UserRepository userRepository = UserRepository.getInstance();
 
     public LiveData<LoginFormState> getLoginFormState() {
         return this.loginFormState;
     }
 
-    public LiveData<Result> getResult() {
+    public LiveData<Result<LoggedInUserView>> getResult() {
         return this.result;
     }
 
@@ -47,7 +47,7 @@ public class LoginViewModel extends ViewModel {
 
                 final String username = userRepository.getLoggedInUser().getUsername();
                 result.setValue(
-                        new Result(new LoggedInUserView(username))
+                        new Result<>(new LoggedInUserView(username))
                 );
             }
 
