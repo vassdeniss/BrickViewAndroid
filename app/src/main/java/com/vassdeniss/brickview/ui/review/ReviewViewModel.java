@@ -28,6 +28,7 @@ public class ReviewViewModel extends ViewModel {
             public void onSuccess(JSONObject jsonResult) {
                 final Gson gson = new Gson();
                 final SetDetails details = gson.fromJson(jsonResult.toString(), SetDetails.class);
+                result.setValue(new Result<>(details));
             }
 
             @Override

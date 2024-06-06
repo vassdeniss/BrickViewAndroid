@@ -31,7 +31,7 @@ public class ReviewFragment extends Fragment {
                              Bundle savedInstanceState) {
         this.binding = FragmentReviewBinding.inflate(inflater, container, false);
 
-        final ReviewViewModel reviewViewModel = new ViewModelProvider(this, new ProfileViewModelFactory())
+        final ReviewViewModel reviewViewModel = new ViewModelProvider(this, new ReviewViewModelFactory())
                 .get(ReviewViewModel.class);
 
         final Bundle args = this.getArguments();
